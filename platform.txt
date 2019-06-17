@@ -4,6 +4,8 @@ name=ODROID Arduino
 # ODROID compile variables
 ##########################
 
+compiler.path=/usr/bin
+
 compiler.S.cmd=
 compiler.S.flags=
 
@@ -18,7 +20,13 @@ compiler.c.flags=
 #########################
 
 ## Compile S files
+recipe.S.o.pattern="{compiler.S.cmd}" -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} "{source_file}" -o "{object_file}"
 
 ## Compile c files
+recipe.c.o.pattern="{compiler.c.cmd}" -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} "{source_file}" -o "{object_file}"
 
 ## Compile c++ files
+recipe.cpp.o.pattern="{compiler.cpp.cmd}" -I{build.path} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} "{source_file}" -o "{object_file}"
+
+# {runtime.platform.path} == ~/Arduino/hardware/hardkernel/odroid
+# {build.path}
