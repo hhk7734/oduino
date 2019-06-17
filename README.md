@@ -1,4 +1,5 @@
 # arduino-odroid
+
 Arduino core for the ODROID
 
 ## Installation
@@ -13,3 +14,11 @@ git clone https://github.com/hhk7734/arduino-odroid.git odroid
 ```
 
 - Restart Arduino IDE
+
+## FS
+
+* cores/odroid : core source and header
+* variants/ : pin map
+* boards.txt
+* platform.txt
+* programmers.txt
