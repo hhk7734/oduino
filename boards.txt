@@ -1,0 +1,5 @@
+odroid_n2.name=ODROID N2
+
+################################################
+
+odroid_xu4.name=ODROID XU4

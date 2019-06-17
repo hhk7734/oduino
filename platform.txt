@@ -1,0 +1,24 @@
+name=ODROID Arduino
+
+##########################
+# ODROID compile variables
+##########################
+
+compiler.S.cmd=
+compiler.S.flags=
+
+compiler.c.cmd=gcc
+compiler.c.flags=
+
+compiler.cpp.cmd=g++
+compiler.c.flags=
+
+#########################
+# ODROID compile patterns
+#########################
+
+## Compile S files
+
+## Compile c files
+
+## Compile c++ files
