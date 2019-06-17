@@ -4,7 +4,12 @@ name=ODROID Arduino
 # ODROID compile variables
 ##########################
 
-compiler.path=/usr/bin
+compiler.path=/usr/bin/
+
+build.extra_flags=
+compiler.c.extra_flags=
+compiler.S.extra_flags=
+compiler.cpp.extra_flags=
 
 compiler.S.cmd=
 compiler.S.flags=
@@ -15,18 +20,29 @@ compiler.c.flags=
 compiler.cpp.cmd=g++
 compiler.c.flags=
 
+compiler.ar.cmd=g++
+
+recipe.preproc.includes="{compiler.path}{compiler.cpp.cmd}" {compiler.cpp.flags} {preproc.includes.flags} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.cpp.extra_flags} {build.extra_flags} {includes} "{source_file}"
+preproc.includes.flags=
+
+recipe.preproc.macros="{compiler.path}{compiler.cpp.cmd}" {compiler.cpp.flags} {preproc.macros.flags} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.cpp.extra_flags} {build.extra_flags} {includes} "{source_file}" -o "{preprocessed_file_path}"
+preproc.macros.flags=
+
 #########################
 # ODROID compile patterns
 #########################
 
 ## Compile S files
-recipe.S.o.pattern="{compiler.S.cmd}" -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} "{source_file}" -o "{object_file}"
+recipe.S.o.pattern={compiler.S.cmd} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.S.extra_flags} {build.extra_flags} {includes} "{source_file}" -o "{object_file}"
 
 ## Compile c files
-recipe.c.o.pattern="{compiler.c.cmd}" -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} "{source_file}" -o "{object_file}"
+recipe.c.o.pattern={compiler.c.cmd} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.c.extra_flags} {build.extra_flags} {includes} "{source_file}" -o "{object_file}"
 
 ## Compile c++ files
-recipe.cpp.o.pattern="{compiler.cpp.cmd}" -I{build.path} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} "{source_file}" -o "{object_file}"
+recipe.cpp.o.pattern={compiler.cpp.cmd} -I{build.path} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.cpp.extra_flags} {build.extra_flags} {includes} "{source_file}" -o "{object_file}"
+
+recipe.ar.pattern="{compiler.path}{compiler.ar.cmd}" {compiler.ar.flags} {compiler.ar.extra_flags} "{archive_file_path}" "{object_file}"
 
 # {runtime.platform.path} == ~/Arduino/hardware/hardkernel/odroid
-# {build.path}
+# {build.path} == /tmp/xxx
+# {includes} == -I%HOME/Arduino/hardware/hardkernel/odroid/cores/{build.core} -I%HOME/Arduino/hardware/hardkernel/odroid/variants/{build.variant}

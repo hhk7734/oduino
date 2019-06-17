@@ -1,7 +1,10 @@
 odroid_n2.name=ODROID N2
 
-odroid_n2.build.board=ODROID_N2
+odroid_n2.upload.tool=
+
 odroid_n2.build.core=odroid
+odroid_n2.build.variant=odroid_n2
+odroid_n2.build.board=ODROID_N2
 
 ################################################
 
