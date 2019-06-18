@@ -8,6 +8,7 @@ Arduino core for the ODROID
 - Open Terminal and execute the following command (copy->paste and hit enter):
 
 ```bash
+sudo apt install -y xterm &&\
 mkdir -p ~/Arduino/hardware/hardkernel && \
 cd ~/Arduino/hardware/hardkernel && \
 git clone https://github.com/hhk7734/arduino-odroid.git odroid
