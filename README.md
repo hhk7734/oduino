@@ -16,3 +16,9 @@ git clone https://github.com/hhk7734/arduino-odroid.git odroid
 - Restart Arduino IDE
 
 [https://github.com/arduino/Arduino/wiki/Arduino-IDE-1.5-3rd-party-Hardware-specification](https://github.com/arduino/Arduino/wiki/Arduino-IDE-1.5-3rd-party-Hardware-specification)
+
+## todo
+
+- add core source
+- pseudo serial or other method for communication
+- start and stop process
