@@ -1,3 +1,0 @@
-[submodule "cores/odroid/wiringPi"]
-	path = cores/odroid/wiringPi
-	url = https://github.com/hardkernel/wiringPi
