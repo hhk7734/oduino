@@ -17,6 +17,15 @@ git clone https://github.com/hhk7734/arduino-odroid.git odroid
 
 [https://github.com/arduino/Arduino/wiki/Arduino-IDE-1.5-3rd-party-Hardware-specification](https://github.com/arduino/Arduino/wiki/Arduino-IDE-1.5-3rd-party-Hardware-specification)
 
+- wiringPi installation
+
+```bash
+cd &&\
+git clone https://github.com/hardkernel/wiringPi &&\
+cd wiringPi &&\
+sudo ./build
+```
+
 ## todo
 
 - add core source

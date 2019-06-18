@@ -1,5 +1,4 @@
 #include <Arduino.h>
-#include <iostream>
 
 int main( void )
 {
@@ -37,6 +36,8 @@ int main( void )
     // std::cout << "               ╚██████╔╝██████╔╝██║  ██║╚██████╔╝██║██████╔╝" << std::endl;
     // std::cout << "                ╚═════╝ ╚═════╝ ╚═╝  ╚═╝ ╚═════╝ ╚═╝╚═════╝ " << std::endl;
     std::cout << "\033[0m" << std::endl;
+
+    wiringPiSetup();
 
     setup();
 

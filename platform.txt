@@ -24,10 +24,10 @@ compiler.S.cmd=
 compiler.S.flags=
 
 compiler.c.cmd=gcc
-compiler.c.flags= -c -g
+compiler.c.flags= -c -g -lwiringPi -lwiringPiDev -lm -lpthread -lrt -lcrypt
 
 compiler.cpp.cmd=g++
-compiler.cpp.flags= -c -g
+compiler.cpp.flags= -c -g -lwiringPi -lwiringPiDev -lm -lpthread -lrt -lcrypt
 
 compiler.ar.cmd=ar
 compiler.ar.flags=rcs
