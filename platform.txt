@@ -34,7 +34,7 @@ compiler.ar.flags=rcs
 
 compiler.c.elf.cmd=g++
 compiler.c.elf.flags=-g -flto -fuse-linker-plugin -Wl,--gc-sections
-compiler.c.elf.libs=
+compiler.c.elf.libs=-lwiringPi -lwiringPiDev -lm -lpthread -lrt -lcrypt
 
 
 #########################
@@ -55,7 +55,7 @@ archive_file_path={build.path}/{archive_file}
 recipe.ar.pattern="{compiler.path}{compiler.ar.cmd}" {compiler.ar.flags} {compiler.ar.extra_flags} "{archive_file_path}" "{object_file}"
 
 ## Combine gc-sections, archives, and objects
-recipe.c.combine.pattern="{compiler.path}{compiler.c.elf.cmd}" {compiler.c.elf.flags} {compiler.c.elf.extra_flags} -o "{build.path}/{build.project_name}.out" {object_files} "{build.path}/{archive_file}" "-L{build.path}" -lm
+recipe.c.combine.pattern="{compiler.path}{compiler.c.elf.cmd}" {compiler.c.elf.flags} {compiler.c.elf.extra_flags} -o "{build.path}/{build.project_name}.out" {object_files} "{build.path}/{archive_file}" "-L{build.path}"
 
 ## Preprocessor
 recipe.preproc.includes="{compiler.path}{compiler.cpp.cmd}" {compiler.cpp.flags} {preproc.includes.flags} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.cpp.extra_flags} {build.extra_flags} {includes} "{source_file}"
