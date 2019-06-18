@@ -33,3 +33,4 @@ sudo ./build
 - pseudo serial or other method for communication
 - start and stop process
 - wiringPi
+- program pattern shell script
