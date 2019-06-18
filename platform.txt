@@ -69,7 +69,7 @@ preproc.macros.flags= -w -x c++ -E -CC
 ##############
 
 tools.terminal.path=
-tools.terminal.cmd.path=/usr/bin/gnome-terminal
+tools.terminal.cmd.path=/usr/bin/xterm
 
 tools.terminal.upload.params.verbose=
 tools.terminal.upload.params.quiet=
