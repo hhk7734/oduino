@@ -1,1 +1,3 @@
 direct.name=Direct start
+direct.program.tool=terminal
+direct.program.extra_params=
