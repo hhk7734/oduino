@@ -15,10 +15,4 @@ git clone https://github.com/hhk7734/arduino-odroid.git odroid
 
 - Restart Arduino IDE
 
-## FS
-
-* cores/odroid : core source and header
-* variants/ : pin map
-* boards.txt
-* platform.txt
-* programmers.txt
+[https://github.com/arduino/Arduino/wiki/Arduino-IDE-1.5-3rd-party-Hardware-specification](https://github.com/arduino/Arduino/wiki/Arduino-IDE-1.5-3rd-party-Hardware-specification)
