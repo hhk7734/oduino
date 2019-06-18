@@ -8,11 +8,6 @@ Arduino core for the ODROID
 - Open Terminal and execute the following command (copy->paste and hit enter):
 
 ```bash
-cd &&\
-git clone https://github.com/hardkernel/wiringPi &&\
-cd wiringPi &&\
-sudo ./build
-
 mkdir -p ~/Arduino/hardware/hardkernel && \
 cd ~/Arduino/hardware/hardkernel && \
 git clone https://github.com/hhk7734/arduino-odroid.git odroid
@@ -27,3 +22,4 @@ git clone https://github.com/hhk7734/arduino-odroid.git odroid
 - add core source
 - pseudo serial or other method for communication
 - start and stop process
+- wiringPi
