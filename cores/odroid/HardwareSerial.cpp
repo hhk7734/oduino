@@ -50,7 +50,7 @@ void *stdin_thread_loop( void *arg )
         if( temp == '\n' )
         {
             buffer[buffer_head] = '\r';
-            buffer_head = ( buffer_head + 1 ) % BUFFER_SIZE;
+            buffer_head         = ( buffer_head + 1 ) % BUFFER_SIZE;
             if( buffer_head == buffer_tail ) { buffer_tail = ( buffer_tail + 1 ) % BUFFER_SIZE; }
         }
         buffer[buffer_head] = temp;

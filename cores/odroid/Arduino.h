@@ -29,7 +29,7 @@
 #include "HardwareSerial.h"
 
 #ifdef __cplusplus
-extern "C"{
+extern "C" {
 #endif
 
 #define PI 3.1415926535897932384626433832795
@@ -42,35 +42,37 @@ extern "C"{
 // #define min(a,b) ((a)<(b)?(a):(b))
 // #define max(a,b) ((a)>(b)?(a):(b))
 // #define abs(x) ((x)>0?(x):-(x))
-#define constrain(amt,low,high) ((amt)<(low)?(low):((amt)>(high)?(high):(amt)))
-#define round(x)     ((x)>=0?(long)((x)+0.5):(long)((x)-0.5))
-#define radians(deg) ((deg)*DEG_TO_RAD)
-#define degrees(rad) ((rad)*RAD_TO_DEG)
-#define sq(x) ((x)*(x))
+#define constrain( amt, low, high ) \
+    ( ( amt ) < ( low ) ? ( low ) : ( ( amt ) > ( high ) ? ( high ) : ( amt ) ) )
+#define round( x ) ( ( x ) >= 0 ? ( long )( ( x ) + 0.5 ) : ( long )( ( x )-0.5 ) )
+#define radians( deg ) ( ( deg )*DEG_TO_RAD )
+#define degrees( rad ) ( ( rad )*RAD_TO_DEG )
+#define sq( x ) ( ( x ) * ( x ) )
 
 #define interrupts() sei()
 #define noInterrupts() cli()
 
-#define lowByte(w) ((uint8_t) ((w) & 0xff))
-#define highByte(w) ((uint8_t) ((w) >> 8))
+#define lowByte( w ) ( ( uint8_t )( ( w )&0xff ) )
+#define highByte( w ) ( ( uint8_t )( ( w ) >> 8 ) )
 
-#define bitRead(value, bit) (((value) >> (bit)) & 0x01)
-#define bitSet(value, bit) ((value) |= (1UL << (bit)))
-#define bitClear(value, bit) ((value) &= ~(1UL << (bit)))
-#define bitWrite(value, bit, bitvalue) (bitvalue ? bitSet(value, bit) : bitClear(value, bit))
+#define bitRead( value, bit ) ( ( ( value ) >> ( bit ) ) & 0x01 )
+#define bitSet( value, bit ) ( ( value ) |= ( 1UL << ( bit ) ) )
+#define bitClear( value, bit ) ( ( value ) &= ~( 1UL << ( bit ) ) )
+#define bitWrite( value, bit, bitvalue ) \
+    ( bitvalue ? bitSet( value, bit ) : bitClear( value, bit ) )
 
-#define bit(b) (1UL << (b))
-#define _BV(b) (1UL << (b))
+#define bit( b ) ( 1UL << ( b ) )
+#define _BV( b ) ( 1UL << ( b ) )
 
 void setup( void );
 void loop( void );
 
 #ifdef __cplusplus
-} // extern "C"
+}    // extern "C"
 #endif
 
-using std::min;
-using std::max;
 using std::abs;
+using std::max;
+using std::min;
 
-#endif // Arduino_h
+#endif    // Arduino_h
