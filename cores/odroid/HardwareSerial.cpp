@@ -29,17 +29,44 @@
 
 #include <wiringSerial.h>
 #include <unistd.h>
+#include <pthread.h>
 
 HardwareSerial::HardwareSerial( uint8_t _uart_num )
     : uart_num( _uart_num )
 {
 }
 
+const int BUFFER_SIZE = 256;
+char      buffer[BUFFER_SIZE];
+uint16_t  buffer_head = 0;
+uint16_t  buffer_tail = 0;
+pthread_t stdin_thread;
+
+void *stdin_thread_loop( void *arg )
+{
+    for( ;; )
+    {
+        char temp = serialGetchar( STDIN_FILENO );
+        if( temp == '\n' )
+        {
+            buffer[buffer_head] = '\r';
+            buffer_head = ( buffer_head + 1 ) % BUFFER_SIZE;
+            if( buffer_head == buffer_tail ) { buffer_tail = ( buffer_tail + 1 ) % BUFFER_SIZE; }
+        }
+        buffer[buffer_head] = temp;
+        buffer_head         = ( buffer_head + 1 ) % BUFFER_SIZE;
+        if( buffer_head == buffer_tail ) { buffer_tail = ( buffer_tail + 1 ) % BUFFER_SIZE; }
+    }
+}
+
 int HardwareSerial::begin( uint32_t baud_rate )
 {
     switch( uart_num )
     {
-        case 0: fd = STDOUT_FILENO; break;
+        case 0:
+            fd = STDOUT_FILENO;
+            pthread_create( &stdin_thread, NULL, stdin_thread_loop, NULL );
+            break;
         case 1: fd = serialOpen( "/dev/ttyS1", baud_rate ); break;
         case 2: fd = serialOpen( "/dev/ttyS2", baud_rate ); break;
         default: fd = -1; break;
@@ -53,12 +80,33 @@ void HardwareSerial::end()
     if( uart_num != 0 ) { serialClose( fd ); }
 }
 
-int HardwareSerial::available( void ) { serialDataAvail( fd ); }
-
+int HardwareSerial::available( void )
+{
+    if( uart_num != 0 ) { return serialDataAvail( fd ); }
+    else
+    {
+        return ( BUFFER_SIZE + buffer_head - buffer_tail ) % BUFFER_SIZE;
+    }
+}
 int HardwareSerial::peek( void ) {}
 
-int HardwareSerial::read( void ) { return serialGetchar( fd ); }
-
+int HardwareSerial::read( void )
+{
+    if( uart_num != 0 ) { return serialGetchar( fd ); }
+    else
+    {
+        if( available() != 0 )
+        {
+            char temp   = buffer[buffer_tail];
+            buffer_tail = ( buffer_tail + 1 ) % BUFFER_SIZE;
+            return temp;
+        }
+        else
+        {
+            return -1;
+        }
+    }
+}
 int HardwareSerial::availableForWrite( void ) {}
 
 void HardwareSerial::flush( void ) {}
