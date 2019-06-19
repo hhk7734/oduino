@@ -73,8 +73,8 @@ tools.terminal.cmd=xterm
 
 tools.terminal.upload.params.verbose=
 tools.terminal.upload.params.quiet=
-tools.terminal.upload.pattern=
+tools.terminal.upload.pattern={cmd} -e "sudo {build.path}/{build.project_name}.out"
 
 tools.terminal.program.params.verbose=
 tools.terminal.program.params.quiet=
-tools.terminal.program.pattern=
+tools.terminal.program.pattern={cmd} -e "sudo {build.path}/{build.project_name}.out"

@@ -27,10 +27,31 @@ cd wiringPi &&\
 sudo ./build
 ```
 
+## passwd
+
+If you don't want to input your passwd every upload, you have two options.
+
+### first option
+
+```bash
+sudo ln -s ~/Arduino/hardware /root/Arduino
+```
+
+```bash
+sudo arduino
+```
+
+### secound option
+
+```bash
+sudo visudo
+
+odroid ALL=(ALL) NOPASSWD:ALL
+```
+
 ## todo
 
 - add core source
 - pseudo serial or other method for communication
 - start and stop process
 - wiringPi
-- program pattern shell script

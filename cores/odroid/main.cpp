@@ -37,6 +37,8 @@ int main( void )
     // std::cout << "                ╚═════╝ ╚═════╝ ╚═╝  ╚═╝ ╚═════╝ ╚═╝╚═════╝ " << std::endl;
     std::cout << "\033[0m" << std::endl;
 
+    std::cout << "If you want to stop this program, please input 'Ctrl + C'" << std::endl;
+
     wiringPiSetup();
 
     setup();
