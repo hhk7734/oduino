@@ -52,6 +52,4 @@ odroid ALL=(ALL) NOPASSWD:ALL
 ## todo
 
 - add core source
-- pseudo serial or other method for communication
-- start and stop process
-- wiringPi
+- wiringPi -> C code
