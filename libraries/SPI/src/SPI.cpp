@@ -26,6 +26,8 @@
 #include <wiringPiSPI.h>
 #include <unistd.h>
 
+SPIClass SPI;
+
 int      SPIClass::fd          = -1;
 uint32_t SPIClass::clock_speed = 1000000;
 uint8_t  SPIClass::spi_mode    = 0;
