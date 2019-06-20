@@ -76,6 +76,7 @@ uint8_t TwoWire::endTransmission( uint8_t stop )
     {
         struct i2c_rdwr_ioctl_data i2c;
         struct i2c_msg             msgs;
+        msgs.addr  = device_address;
         msgs.flags = 0;
         msgs.len   = tx_buff_index;
         msgs.buf   = tx_buff;
