@@ -35,6 +35,7 @@ TwoWire Wire1( 1 );
 
 TwoWire::TwoWire( uint8_t _i2c_num )
     : i2c_num( _i2c_num )
+    , fd( 0 )
 {
 }
 
@@ -48,10 +49,14 @@ void TwoWire::begin( void )
         case 1: device = "/dev/i2c-3"; break;
     }
 #endif
-    if( ( fd = open( device, O_RDWR ) ) < 0 )
+
+    if( fd == 0 )
     {
-        fprintf( stderr, "Unable to open %s : %s\n", device, strerror( errno ) );
-        exit( -1 );
+        if( ( fd = open( device, O_RDWR ) ) < 0 )
+        {
+            fprintf( stderr, "Unable to open %s : %s\n", device, strerror( errno ) );
+            exit( -1 );
+        }
     }
 }
 
