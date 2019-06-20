@@ -3,6 +3,7 @@ name=ODROID Arduino
 # {runtime.platform.path} == ~/Arduino/hardware/hardkernel/odroid
 # {runtime.hardware.path} == ~/Arduino/hardware/hardkernel
 # {build.path} == /tmp/xxx
+# {build.project_name}
 # {includes} == -I%HOME/Arduino/hardware/hardkernel/odroid/cores/{build.core} -I%HOME/Arduino/hardware/hardkernel/odroid/variants/{build.variant}
 # {runtime.os} == ("linux", "windows", "macosx")
 
