@@ -30,20 +30,17 @@
 #define SPI_MODE3 3
 
 #ifndef LSBFIRST
-#define LSBFIRST 0
+#    define LSBFIRST 0
 #endif
 #ifndef MSBFIRST
-#define MSBFIRST 1
+#    define MSBFIRST 1
 #endif
 
 class SPISettings
 {
 public:
     SPISettings();
-    SPISettings(uint32_t clock, uint8_t bitOrder, uint8_t dataMode)
-    {
-
-    }
+    SPISettings( uint32_t clock, uint8_t bitOrder, uint8_t dataMode ) {}
     friend class SPIClass;
 };
 
