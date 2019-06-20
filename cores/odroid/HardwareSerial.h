@@ -27,7 +27,8 @@
 
 #include "Stream.h"
 
-class HardwareSerial : public Stream {
+class HardwareSerial : public Stream
+{
 public:
     HardwareSerial( uint8_t _uart_num );
     int            begin( uint32_t baud_rate );

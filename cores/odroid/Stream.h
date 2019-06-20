@@ -47,7 +47,8 @@ enum LookaheadMode
 
 #define NO_IGNORE_CHAR '\x01'    // a char not found in a valid ASCII numeric field
 
-class Stream : public Print {
+class Stream : public Print
+{
 protected:
     unsigned long
                   _timeout;    // number of milliseconds to wait for the next char before aborting timed read

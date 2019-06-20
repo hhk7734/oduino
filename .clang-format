@@ -20,7 +20,7 @@ AlwaysBreakTemplateDeclarations: Yes            # 템플릿 줄 바꿈
 BinPackArguments: true                          # 매개변수 정렬
 BinPackParameters: false                        # 선언시 매개변수 정렬
 BraceWrapping:
-  AfterClass:      false
+  AfterClass:      true
   AfterControlStatement: true                   # if, else, for 등 다음줄에 { 시작
   AfterEnum:       true
   AfterFunction:   true

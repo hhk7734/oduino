@@ -34,7 +34,8 @@
 #endif
 #define BIN 2
 
-class Print {
+class Print
+{
 private:
     int    write_error;
     size_t printNumber( unsigned long, uint8_t );
