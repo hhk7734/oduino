@@ -50,7 +50,7 @@ void SPIClass::setDataMode( uint8_t dataMode )
 }
 void SPIClass::setClockDivider( uint8_t clockDiv ) {}
 
-void setFrequency( uint32_t freq )
+void SPIClass::setFrequency( uint32_t freq )
 {
     clock_speed = freq;
     begin( clock_speed, spi_mode );
@@ -65,7 +65,7 @@ uint8_t SPIClass::transfer( uint8_t data )
     return data;
 }
 
-uint8_t SPIClass::transfer( void *buf, size_t count )
+uint8_t SPIClass::transfer( uint8_t *buf, size_t count )
 {
     return wiringPiSPIDataRW( fd, buf, count );
 }
