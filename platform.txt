@@ -79,3 +79,7 @@ tools.terminal.upload.params.quiet=
 tools.terminal.upload.pattern={cmd} -e "sudo {build.path}/{build.project_name}.out 2> error.log"
 
 tools.terminal.upload.network_pattern={network_cmd}
+
+tools.terminal.program.params.verbose=
+tools.terminal.program.params.quiet=
+tools.terminal.program.pattern={cmd} -e "sudo {build.path}/{build.project_name}.out 2> error.log"
