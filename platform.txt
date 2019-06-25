@@ -25,17 +25,17 @@ compiler.S.cmd=
 compiler.S.flags=
 
 compiler.c.cmd=gcc
-compiler.c.flags= -c -g -lwiringPi -lwiringPiDev -lm -lpthread -lrt -lcrypt
+compiler.c.flags= -c -g -lm -lpthread -lrt -lcrypt
 
 compiler.cpp.cmd=g++
-compiler.cpp.flags= -c -g -lwiringPi -lwiringPiDev -lm -lpthread -lrt -lcrypt
+compiler.cpp.flags= -c -g -lm -lpthread -lrt -lcrypt
 
 compiler.ar.cmd=ar
 compiler.ar.flags=rcs
 
 compiler.c.elf.cmd=g++
 compiler.c.elf.flags=-g -flto -fuse-linker-plugin -Wl,--gc-sections
-compiler.c.elf.libs=-lwiringPi -lwiringPiDev -lm -lpthread -lrt -lcrypt
+compiler.c.elf.libs=-lm -lpthread -lrt -lcrypt
 
 
 #########################
@@ -72,10 +72,10 @@ preproc.macros.flags= -w -x c++ -E -CC
 tools.terminal.path=
 tools.terminal.cmd=mate-terminal
 
+tools.terminal.network_cmd=scp
+
 tools.terminal.upload.params.verbose=
 tools.terminal.upload.params.quiet=
 tools.terminal.upload.pattern={cmd} -e "sudo {build.path}/{build.project_name}.out 2> error.log"
 
-tools.terminal.program.params.verbose=
-tools.terminal.program.params.quiet=
-tools.terminal.program.pattern={cmd} -e "sudo {build.path}/{build.project_name}.out 2> error.log"
+tools.terminal.upload.network_pattern={network_cmd}
