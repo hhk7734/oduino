@@ -58,13 +58,6 @@ recipe.output.save_file={build.project_name}.{build.variant}.out
 tools.bash.path={runtime.platform.path}/tools/
 tools.bash.cmd=terminal.sh
 
-tools.bash.upload.params.verbose=
-tools.bash.upload.params.quiet=
-#tools.bash.upload.pattern="{path}{cmd}" {build.path}/{build.project_name}.out
-
 tools.bash.program.params.verbose=
 tools.bash.program.params.quiet=
 tools.bash.program.pattern=sh "{path}{cmd}" {build.path}/{build.project_name}.out
-
-# tools.bash.erase.pattern=
-# tools.bash.bootloader.pattern=
