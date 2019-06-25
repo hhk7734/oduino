@@ -6,5 +6,5 @@ odroid_n2.name=ODROID N2
 odroid_n2.build.core=odroid
 odroid_n2.build.variant=odroid_n2
 odroid_n2.build.board=ODROID_N2
-odroid_n2.upload.tool=terminal
+odroid_n2.upload.tool=bash
 odroid_n2.compiler.cross_compile=aarch64-linux-gnu-
