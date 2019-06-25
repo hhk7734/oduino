@@ -1,85 +1,70 @@
-name=ODROID Arduino
-
-# {runtime.platform.path} == ~/Arduino/hardware/hardkernel/odroid
-# {runtime.hardware.path} == ~/Arduino/hardware/hardkernel
-# {build.path} == /tmp/xxx
-# {build.project_name}
-# {includes} == -I%HOME/Arduino/hardware/hardkernel/odroid/cores/{build.core} -I%HOME/Arduino/hardware/hardkernel/odroid/variants/{build.variant}
-# {runtime.os} == ("linux", "windows", "macosx")
-
+name=ODROID
 
 ##########################
 # ODROID compile variables
 ##########################
 
-compiler.path=/usr/bin/
-
-build.extra_flags=
-compiler.c.extra_flags=
-compiler.S.extra_flags=
-compiler.cpp.extra_flags=
-compiler.ar.extra_flags=
-compiler.c.elf.extra_flags=
+compiler.path=
 
 compiler.S.cmd=
 compiler.S.flags=
 
 compiler.c.cmd=gcc
-compiler.c.flags= -c -g -lm -lpthread -lrt -lcrypt
+compiler.c.flags=-c -g -lm -lpthread -lrt -lcrypt
 
 compiler.cpp.cmd=g++
-compiler.cpp.flags= -c -g -lm -lpthread -lrt -lcrypt
+compiler.cpp.flags={compiler.c.flags}
 
 compiler.ar.cmd=ar
 compiler.ar.flags=rcs
 
-compiler.c.elf.cmd=g++
-compiler.c.elf.flags=-g -flto -fuse-linker-plugin -Wl,--gc-sections
-compiler.c.elf.libs=-lm -lpthread -lrt -lcrypt
+compiler.combine.cmd={compiler.cpp.cmd}
+compiler.combine.flags=-g -flto -fuse-linker-plugin -Wl,--gc-sections
+compiler.combine.libs=-lm -lpthread -lrt -lcrypt
 
+# override
+build.extra_flags=
+compiler.cross_compile=
+compiler.S.extra_flags=
+compiler.c.extra_flags=
+compiler.cpp.extra_flags=
+compiler.ar.extra_flags=
+compiler.combine.extra_flags=
 
 #########################
 # ODROID compile patterns
 #########################
 
-## Compile S files
-recipe.S.o.pattern="{compiler.path}{compiler.S.cmd}" {compiler.S.flags} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.S.extra_flags} {build.extra_flags} {includes} "{source_file}" -o "{object_file}"
-
-## Compile c files
-recipe.c.o.pattern="{compiler.path}{compiler.c.cmd}" {compiler.c.flags} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.c.extra_flags} {build.extra_flags} {includes} "{source_file}" -o "{object_file}"
-
-## Compile c++ files
-recipe.cpp.o.pattern="{compiler.path}{compiler.cpp.cmd}" {compiler.cpp.flags} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.cpp.extra_flags} {build.extra_flags} {includes} "{source_file}" -o "{object_file}"
-
-## Create archives
-archive_file_path={build.path}/{archive_file}
-recipe.ar.pattern="{compiler.path}{compiler.ar.cmd}" {compiler.ar.flags} {compiler.ar.extra_flags} "{archive_file_path}" "{object_file}"
-
-## Combine gc-sections, archives, and objects
-recipe.c.combine.pattern="{compiler.path}{compiler.c.elf.cmd}" {compiler.c.elf.flags} {compiler.c.elf.extra_flags} -o "{build.path}/{build.project_name}.out" {object_files} "{build.path}/{archive_file}" "-L{build.path}" {compiler.c.elf.libs}
-
-## Preprocessor
-recipe.preproc.includes="{compiler.path}{compiler.cpp.cmd}" {compiler.cpp.flags} {preproc.includes.flags} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.cpp.extra_flags} {build.extra_flags} {includes} "{source_file}"
-preproc.includes.flags= -w -x c++ -M -MG -MP
-
-recipe.preproc.macros="{compiler.path}{compiler.cpp.cmd}" {compiler.cpp.flags} {preproc.macros.flags} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.cpp.extra_flags} {build.extra_flags} {includes} "{source_file}" -o "{preprocessed_file_path}"
+recipe.preproc.macros="{compiler.path}{compiler.cross_compile}{compiler.cpp.cmd}" {compiler.cpp.flags} {preproc.macros.flags} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.cpp.extra_flags} {build.extra_flags} {includes} "{source_file}" -o "{preprocessed_file_path}"
 preproc.macros.flags= -w -x c++ -E -CC
+
+recipe.S.o.pattern="{compiler.path}{compiler.cross_compile}{compiler.S.cmd}" {compiler.S.flags} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.S.extra_flags} {build.extra_flags} {includes} "{source_file}" -o "{object_file}"
+
+recipe.c.o.pattern="{compiler.path}{compiler.cross_compile}{compiler.c.cmd}" {compiler.c.flags} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.c.extra_flags} {build.extra_flags} {includes} "{source_file}" -o "{object_file}"
+
+recipe.cpp.o.pattern="{compiler.path}{compiler.cross_compile}{compiler.cpp.cmd}" {compiler.cpp.flags} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.cpp.extra_flags} {build.extra_flags} {includes} "{source_file}" -o "{object_file}"
+
+recipe.ar.pattern="{compiler.path}{compiler.cross_compile}{compiler.ar.cmd}" {compiler.ar.flags} {compiler.ar.extra_flags} "{archive_file_path}" "{object_file}"
+
+recipe.c.combine.pattern="{compiler.path}{compiler.cross_compile}{compiler.combine.cmd}" {compiler.combine.flags} {compiler.combine.extra_flags} {object_files} {archive_file_path} "-L{build.path}" -o "{build.path}/{build.project_name}.out" {compiler.combine.libs}
+
+recipe.output.tmp_file={build.project_name}.out
+recipe.output.save_file={build.project_name}.{build.variant}.out
 
 ##############
 # ODROID tools
 ##############
 
-tools.terminal.path=
-tools.terminal.cmd=mate-terminal
-
-tools.terminal.network_cmd=scp
+tools.terminal.path={runtime.platform.path}/tools/
+tools.terminal.cmd=terminal.sh
 
 tools.terminal.upload.params.verbose=
 tools.terminal.upload.params.quiet=
-tools.terminal.upload.pattern={cmd} -e "sudo {build.path}/{build.project_name}.out 2> error.log"
-
-tools.terminal.upload.network_pattern={network_cmd}
+#tools.terminal.upload.pattern="{path}{cmd}" {build.path}/{build.project_name}.out
 
 tools.terminal.program.params.verbose=
 tools.terminal.program.params.quiet=
-tools.terminal.program.pattern={cmd} -e "sudo {build.path}/{build.project_name}.out 2> error.log"
+tools.terminal.program.pattern=sh "{path}{cmd}" {build.path}/{build.project_name}.out
+
+# tools.terminal.erase.pattern=
+# tools.terminal.bootloader.pattern=
