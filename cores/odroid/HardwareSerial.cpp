@@ -25,8 +25,6 @@
 
 #include "HardwareSerial.h"
 
-#include <iostream>
-
 #include <wiringSerial.h>
 #include <unistd.h>
 #include <pthread.h>
@@ -111,7 +109,11 @@ int HardwareSerial::availableForWrite( void ) {}
 
 void HardwareSerial::flush( void ) {}
 
-size_t HardwareSerial::write( uint8_t c ) { serialPutchar( fd, c ); }
+size_t HardwareSerial::write( uint8_t c )
+{
+    serialPutchar( fd, c );
+    return 1;
+}
 
 HardwareSerial Serial( 0 );
 HardwareSerial Serial1( 1 );
