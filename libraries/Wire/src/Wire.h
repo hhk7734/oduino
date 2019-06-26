@@ -88,7 +88,13 @@ private:
     uint8_t tx_buff_index;
 };
 
-extern TwoWire Wire;
+#if defined( ARDUINO_ODROID_N2 )
+extern TwoWire Wire2;
+extern TwoWire Wire3;
+#elif defined( ARDUINO_ODROID_XU3 ) || defined( ARDUINO_ODROID_XU4 )
 extern TwoWire Wire1;
+extern TwoWire Wire5;
+#endif
+extern TwoWire &Wire;
 
 #endif    // _WIRE_H_

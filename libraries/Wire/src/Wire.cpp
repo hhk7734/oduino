@@ -30,8 +30,15 @@
 #include <sys/ioctl.h>
 #include <unistd.h>
 
-TwoWire Wire( 0 );
-TwoWire Wire1( 1 );
+#if defined( ARDUINO_ODROID_N2 )
+TwoWire  Wire2( 2 );
+TwoWire  Wire3( 3 );
+TwoWire &Wire = Wire2;
+#elif defined( ARDUINO_ODROID_XU3 ) || defined( ARDUINO_ODROID_XU4 )
+TwoWire  Wire1( 1 );
+TwoWire  Wire5( 5 );
+TwoWire &Wire = Wire1;
+#endif
 
 TwoWire::TwoWire( uint8_t _i2c_num )
     : i2c_num( _i2c_num )
@@ -41,14 +48,9 @@ TwoWire::TwoWire( uint8_t _i2c_num )
 
 void TwoWire::begin( void )
 {
-    const char *device = NULL;
-#ifdef ARDUINO_ODROID_N2
-    switch( i2c_num )
-    {
-        case 0: device = "/dev/i2c-2"; break;
-        case 1: device = "/dev/i2c-3"; break;
-    }
-#endif
+    char device[11];
+
+    sprintf( device, "/dev/i2c-%d", i2c_num );
 
     if( fd == 0 )
     {
