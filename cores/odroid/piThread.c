@@ -26,9 +26,7 @@
 #include <pthread.h>
 #include "wiringPi.h"
 
-static pthread_mutex_t piMutexes [4] ;
-
-
+static pthread_mutex_t piMutexes[4];
 
 /*
  * piThreadCreate:
@@ -36,11 +34,11 @@ static pthread_mutex_t piMutexes [4] ;
  *********************************************************************************
  */
 
-int piThreadCreate (void *(*fn)(void *))
+int piThreadCreate( void *( *fn )( void * ))
 {
-  pthread_t myThread ;
+    pthread_t myThread;
 
-  return pthread_create (&myThread, NULL, fn, NULL) ;
+    return pthread_create( &myThread, NULL, fn, NULL );
 }
 
 /*
@@ -51,13 +49,6 @@ int piThreadCreate (void *(*fn)(void *))
  *********************************************************************************
  */
 
-void piLock (int key)
-{
-  pthread_mutex_lock (&piMutexes [key]) ;
-}
+void piLock( int key ) { pthread_mutex_lock( &piMutexes[key] ); }
 
-void piUnlock (int key)
-{
-  pthread_mutex_unlock (&piMutexes [key]) ;
-}
-
+void piUnlock( int key ) { pthread_mutex_unlock( &piMutexes[key] ); }
