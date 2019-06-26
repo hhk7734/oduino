@@ -52,7 +52,12 @@ protected:
 };
 
 extern HardwareSerial Serial;
+#if defined( ARDUINO_ODROID_N2 )
 extern HardwareSerial Serial1;
 extern HardwareSerial Serial2;
+#endif
+#if defined( ARDUINO_ODROID_XU3 ) || defined( ARDUINO_ODROID_XU4 )
+extern HardwareSerial Serial1;
+#endif
 
 #endif

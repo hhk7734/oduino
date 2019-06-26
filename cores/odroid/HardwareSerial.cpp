@@ -28,6 +28,14 @@
 #include <wiringSerial.h>
 #include <unistd.h>
 #include <pthread.h>
+HardwareSerial Serial( 0 );
+#if defined( ARDUINO_ODROID_N2 )
+HardwareSerial Serial1( 1 );
+HardwareSerial Serial2( 2 );
+#endif
+#if defined( ARDUINO_ODROID_XU3 ) || defined( ARDUINO_ODROID_XU4 )
+HardwareSerial Serial1( 1 );
+#endif
 
 HardwareSerial::HardwareSerial( uint8_t _uart_num )
     : uart_num( _uart_num )
@@ -65,7 +73,13 @@ int HardwareSerial::begin( uint32_t baud_rate )
             fd = STDOUT_FILENO;
             pthread_create( &stdin_thread, NULL, stdin_thread_loop, NULL );
             break;
-        case 1: fd = serialOpen( "/dev/ttyS1", baud_rate ); break;
+        case 1:
+#if defined( ARDUINO_ODROID_N2 )
+            fd = serialOpen( "/dev/ttyS1", baud_rate );
+#elif defined( ARDUINO_ODROID_XU3 ) || defined( ARDUINO_ODROID_XU4 )
+            fd = serialOpen( "/dev/ttySAC0", baud_rate );
+#endif
+            break;
         case 2: fd = serialOpen( "/dev/ttyS2", baud_rate ); break;
         default: fd = -1; break;
     }
@@ -114,7 +128,3 @@ size_t HardwareSerial::write( uint8_t c )
     serialPutchar( fd, c );
     return 1;
 }
-
-HardwareSerial Serial( 0 );
-HardwareSerial Serial1( 1 );
-HardwareSerial Serial2( 2 );
