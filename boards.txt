@@ -8,3 +8,25 @@ odroid_n2.build.variant=odroid_n2
 odroid_n2.build.board=ODROID_N2
 odroid_n2.upload.tool=bash
 odroid_n2.compiler.cross_compile=aarch64-linux-gnu-
+
+############
+# ODROID XU3
+############
+
+odroid_xu3.name=ODROID XU3
+odroid_xu3.build.core=odroid
+odroid_xu3.build.variant=odroid_xu4
+odroid_xu3.build.board=ODROID_XU3
+odroid_xu3.upload.tool=bash
+odroid_xu3.compiler.cross_compile=arm-linux-gnueabihf-
+
+############
+# ODROID XU4
+############
+
+odroid_xu4.name=ODROID XU4
+odroid_xu4.build.core=odroid
+odroid_xu4.build.variant=odroid_xu4
+odroid_xu4.build.board=ODROID_XU4
+odroid_xu4.upload.tool=bash
+odroid_xu4.compiler.cross_compile=arm-linux-gnueabihf-
