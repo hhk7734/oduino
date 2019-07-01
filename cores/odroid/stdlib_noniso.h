@@ -23,25 +23,23 @@
 #define STDLIB_NONISO_H
 
 #ifdef __cplusplus
-extern "C"{
+extern "C" {
 #endif
 
-char* itoa (int val, char *s, int radix);
+char *itoa( int val, char *s, int radix );
 
-char* ltoa (long val, char *s, int radix);
+char *ltoa( long val, char *s, int radix );
 
-char* utoa (unsigned int val, char *s, int radix);
+char *utoa( unsigned int val, char *s, int radix );
 
-char* ultoa (unsigned long val, char *s, int radix);
- 
-char* dtostrf (double val, signed char width, unsigned char prec, char *s);
+char *ultoa( unsigned long val, char *s, int radix );
 
-void reverse(char* begin, char* end);
+char *dtostrf( double val, signed char width, unsigned char prec, char *s );
+
+void reverse( char *begin, char *end );
 
 #ifdef __cplusplus
-} // extern "C"
+}    // extern "C"
 #endif
 
-
 #endif
-
