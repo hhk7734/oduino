@@ -20,13 +20,18 @@
 #ifndef Arduino_h
 #define Arduino_h
 
-#include <iostream>
-#include <cmath>
 
-#include <wiringPi.h>
 
 #include "binary.h"
+#include "pgmspace.h"
+
+#ifdef __cplusplus
+#include <iostream>
+#include <cmath>
+#include <wiringPi.h>
+
 #include "HardwareSerial.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
