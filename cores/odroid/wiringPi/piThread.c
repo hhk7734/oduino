@@ -1,7 +1,8 @@
 /*
- * wiringPiSPI.h:
- *	Simplified SPI access routines
- *	Copyright (c) 2012-2015 Gordon Henderson
+ * piThread.c:
+ *	Provide a simplified interface to pthreads
+ *
+ *	Copyright (c) 2012 Gordon Henderson
  ***********************************************************************
  * This file is part of wiringPi:
  *	https://projects.drogon.net/raspberry-pi/wiringpi/
@@ -22,15 +23,41 @@
  ***********************************************************************
  */
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <pthread.h>
+#include "wiringPi.h"
 
-int wiringPiSPIGetFd( int channel );
-int wiringPiSPIDataRW( int channel, unsigned char *data, int len );
-int wiringPiSPISetupMode( int channel, int speed, int mode );
-int wiringPiSPISetup( int channel, int speed );
+static pthread_mutex_t piMutexes [4] ;
 
-#ifdef __cplusplus
+
+
+/*
+ * piThreadCreate:
+ *	Create and start a thread
+ *********************************************************************************
+ */
+
+int piThreadCreate (void *(*fn)(void *))
+{
+  pthread_t myThread ;
+
+  return pthread_create (&myThread, NULL, fn, NULL) ;
 }
-#endif
+
+/*
+ * piLock: piUnlock:
+ *	Activate/Deactivate a mutex.
+ *	We're keeping things simple here and only tracking 4 mutexes which
+ *	is more than enough for out entry-level pthread programming
+ *********************************************************************************
+ */
+
+void piLock (int key)
+{
+  pthread_mutex_lock (&piMutexes [key]) ;
+}
+
+void piUnlock (int key)
+{
+  pthread_mutex_unlock (&piMutexes [key]) ;
+}
+

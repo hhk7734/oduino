@@ -1,7 +1,10 @@
 /*
- * softServo.h:
- *	Provide N channels of software driven PWM suitable for RC
- *	servo motors.
+ * softTone.c:
+ *	For that authentic retro sound...
+ *	Er... A little experiment to produce tones out of a Pi using
+ *	one (or 2) GPIO pins and a piezeo "speaker" element.
+ *	(Or a high impedance speaker, but don'y blame me if you blow-up
+ *	the GPIO pins!)
  *	Copyright (c) 2012 Gordon Henderson
  ***********************************************************************
  * This file is part of wiringPi:
@@ -27,8 +30,9 @@
 extern "C" {
 #endif
 
-extern void softServoWrite( int pin, int value );
-extern int  softServoSetup( int p0, int p1, int p2, int p3, int p4, int p5, int p6, int p7 );
+extern int  softToneCreate (int pin) ;
+extern void softToneStop   (int pin) ;
+extern void softToneWrite  (int pin, int freq) ;
 
 #ifdef __cplusplus
 }

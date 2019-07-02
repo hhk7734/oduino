@@ -5,12 +5,13 @@ name=ODROID
 ##########################
 
 compiler.path=
+compiler.wiringPi.path={build.core.path}/wiringPi
 
 compiler.S.cmd=
 compiler.S.flags=
 
 compiler.c.cmd=gcc
-compiler.c.flags=-c -g -lm -lpthread -lrt -lcrypt
+compiler.c.flags=-c -g -lm -lpthread -lrt -lcrypt -I{compiler.wiringPi.path}
 
 compiler.cpp.cmd=g++
 compiler.cpp.flags={compiler.c.flags}

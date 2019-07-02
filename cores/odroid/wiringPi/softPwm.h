@@ -1,7 +1,6 @@
 /*
- * piThread.c:
- *	Provide a simplified interface to pthreads
- *
+ * softPwm.h:
+ *	Provide 2 channels of software driven PWM.
  *	Copyright (c) 2012 Gordon Henderson
  ***********************************************************************
  * This file is part of wiringPi:
@@ -23,32 +22,14 @@
  ***********************************************************************
  */
 
-#include <pthread.h>
-#include "wiringPi.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-static pthread_mutex_t piMutexes[4];
+extern int  softPwmCreate (int pin, int value, int range) ;
+extern void softPwmWrite  (int pin, int value) ;
+extern void softPwmStop   (int pin) ;
 
-/*
- * piThreadCreate:
- *	Create and start a thread
- *********************************************************************************
- */
-
-int piThreadCreate( void *( *fn )( void * ))
-{
-    pthread_t myThread;
-
-    return pthread_create( &myThread, NULL, fn, NULL );
+#ifdef __cplusplus
 }
-
-/*
- * piLock: piUnlock:
- *	Activate/Deactivate a mutex.
- *	We're keeping things simple here and only tracking 4 mutexes which
- *	is more than enough for out entry-level pthread programming
- *********************************************************************************
- */
-
-void piLock( int key ) { pthread_mutex_lock( &piMutexes[key] ); }
-
-void piUnlock( int key ) { pthread_mutex_unlock( &piMutexes[key] ); }
+#endif

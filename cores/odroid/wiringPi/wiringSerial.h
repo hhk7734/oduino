@@ -1,8 +1,6 @@
 /*
- * wiringShift.h:
- *	Emulate some of the Arduino wiring functionality. 
- *
- * Copyright (c) 2009-2012 Gordon Henderson.
+ * wiringSerial.h:
+ *	Handle a serial port
  ***********************************************************************
  * This file is part of wiringPi:
  *	https://projects.drogon.net/raspberry-pi/wiringpi/
@@ -22,19 +20,18 @@
  ***********************************************************************
  */
 
-#define LSBFIRST 0
-#define MSBFIRST 1
-
-#ifndef _STDINT_H
-#    include <stdint.h>
-#endif
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-extern uint8_t shiftIn( uint8_t dPin, uint8_t cPin, uint8_t order );
-extern void    shiftOut( uint8_t dPin, uint8_t cPin, uint8_t order, uint8_t val );
+extern int   serialOpen      (const char *device, const int baud) ;
+extern void  serialClose     (const int fd) ;
+extern void  serialFlush     (const int fd) ;
+extern void  serialPutchar   (const int fd, const unsigned char c) ;
+extern void  serialPuts      (const int fd, const char *s) ;
+extern void  serialPrintf    (const int fd, const char *message, ...) ;
+extern int   serialDataAvail (const int fd) ;
+extern int   serialGetchar   (const int fd) ;
 
 #ifdef __cplusplus
 }

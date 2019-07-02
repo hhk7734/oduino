@@ -1,7 +1,7 @@
 /*
- * softPwm.h:
- *	Provide 2 channels of software driven PWM.
- *	Copyright (c) 2012 Gordon Henderson
+ * wiringPiSPI.h:
+ *	Simplified SPI access routines
+ *	Copyright (c) 2012-2015 Gordon Henderson
  ***********************************************************************
  * This file is part of wiringPi:
  *	https://projects.drogon.net/raspberry-pi/wiringpi/
@@ -26,9 +26,10 @@
 extern "C" {
 #endif
 
-extern int  softPwmCreate( int pin, int value, int range );
-extern void softPwmWrite( int pin, int value );
-extern void softPwmStop( int pin );
+int wiringPiSPIGetFd     (int channel) ;
+int wiringPiSPIDataRW    (int channel, unsigned char *data, int len) ;
+int wiringPiSPISetupMode (int channel, int speed, int mode) ;
+int wiringPiSPISetup     (int channel, int speed) ;
 
 #ifdef __cplusplus
 }
