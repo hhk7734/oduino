@@ -20,15 +20,15 @@
 #ifndef Arduino_h
 #define Arduino_h
 
-#include "binary.h"
-#include "pgmspace.h"
+#include <binary.h>
+#include <avr/pgmspace.h>
 
 #ifdef __cplusplus
 #    include <iostream>
 #    include <cmath>
 #    include <wiringPi.h>
 
-#    include "HardwareSerial.h"
+#    include <HardwareSerial.h>
 #endif
 
 #ifdef __cplusplus
