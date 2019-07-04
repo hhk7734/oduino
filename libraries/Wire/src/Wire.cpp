@@ -30,14 +30,28 @@
 #include <sys/ioctl.h>
 #include <unistd.h>
 
+#if defined( ARDUINO_ODROID_C1 ) || defined( ARDUINO_ODROID_C2 ) || defined( ARDUINO_ODROID_XU3 ) \
+    || defined( ARDUINO_ODROID_XU4 )
+TwoWire Wire1( 1 );
+#endif
+
+#if defined( ARDUINO_ODROID_C1 ) || defined( ARDUINO_ODROID_C2 ) || defined( ARDUINO_ODROID_N2 )
+TwoWire Wire2( 2 );
+#endif
+
 #if defined( ARDUINO_ODROID_N2 )
-TwoWire  Wire2( 2 );
-TwoWire  Wire3( 3 );
-TwoWire &Wire = Wire2;
-#elif defined( ARDUINO_ODROID_XU3 ) || defined( ARDUINO_ODROID_XU4 )
-TwoWire  Wire1( 1 );
-TwoWire  Wire5( 5 );
+TwoWire Wire3( 3 );
+#endif
+
+#if defined( ARDUINO_ODROID_XU3 ) || defined( ARDUINO_ODROID_XU4 )
+TwoWire Wire5( 5 );
+#endif
+
+#if defined( ARDUINO_ODROID_C1 ) || defined( ARDUINO_ODROID_C2 ) || defined( ARDUINO_ODROID_XU3 ) \
+    || defined( ARDUINO_ODROID_XU4 )
 TwoWire &Wire = Wire1;
+#elif defined( ARDUINO_ODROID_N2 )
+TwoWire &Wire = Wire2;
 #endif
 
 TwoWire::TwoWire( uint8_t _i2c_num )
