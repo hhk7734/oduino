@@ -56,4 +56,3 @@ odroid ALL=(ALL) NOPASSWD:ALL
 ## todo
 
 - add core source
-- wiringPi -> C code
