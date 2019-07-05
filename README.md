@@ -19,7 +19,7 @@ $ sudo apt install -y git &&\
   git clone https://github.com/hhk7734/arduino-odroid.git ~/Arduino/hardware/hardkernel/odroid
 ```
 
-- If you already open the Arduino IDE, Reopen Arduino IDE
+- If you already opened the Arduino IDE, Close and reopen the Arduino IDE.
 
 - If you write and compile the code for the your Odroid on the desktop, additionally install a cross compiler.(copy and paste the following command after $)
 
