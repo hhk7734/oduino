@@ -33,6 +33,16 @@ $ echo "for the Odroid c2/n2" &&\
   sudo apt install -y g++-aarch64-linux-gnu
 ```
 
+## setup
+
+### select board
+
+![board](./image/01.select_board.png){: .center}
+
+### select programmer
+
+![programmer](./image/02.select_programmer.png){: .center}
+
 ## passwd
 
 If you don't want to input your passwd every upload, register user as a nopasswd user on the end of the sudoers file.
