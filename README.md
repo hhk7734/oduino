@@ -37,11 +37,11 @@ $ echo "for the Odroid c2/n2" &&\
 
 ### select board
 
-![board](./image/01.select_board.png){: .center}
+![board](./image/01.select_board.png)
 
 ### select programmer
 
-![programmer](./image/02.select_programmer.png){: .center}
+![programmer](./image/02.select_programmer.png)
 
 ## passwd
 
