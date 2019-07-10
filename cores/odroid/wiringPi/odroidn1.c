@@ -88,7 +88,7 @@ static const int phyToGpio[64] = {
 //
 /*----------------------------------------------------------------------------*/
 /* ADC file descriptor */
-static char *adcFds[2];
+static int adcFds[2];
 
 /* GPIO mmap control. Actual GPIO bank number. */
 static volatile uint32_t *gpio[5];
@@ -114,13 +114,13 @@ static void	setIomuxMode 	(int pin, int mode);
 // wiringPi core function
 /*----------------------------------------------------------------------------*/
 static int		_getModeToGpio		(int mode, int pin);
-static void		_pinMode		(int pin, int mode);
+static int		_pinMode		(int pin, int mode);
 static int		_getAlt			(int pin);
-static void		_pullUpDnControl	(int pin, int pud);
+static int		_pullUpDnControl	(int pin, int pud);
 static int		_digitalRead		(int pin);
-static void		_digitalWrite		(int pin, int value);
+static int		_digitalWrite		(int pin, int value);
 static int		_analogRead		(int pin);
-static void		_digitalWriteByte	(const int value);
+static int		_digitalWriteByte	(const unsigned int value);
 static unsigned int	_digitalReadByte	(void);
 
 /*----------------------------------------------------------------------------*/
@@ -263,16 +263,16 @@ static void setIomuxMode (int pin, int mode)
 }
 
 /*----------------------------------------------------------------------------*/
-static void _pinMode (int pin, int mode)
+static int _pinMode (int pin, int mode)
 {
 	int origPin, bank;
-	unsigned long flags;
+	unsigned long UNU flags;
 
 	if (lib->mode == MODE_GPIO_SYS)
-		return;
+		return -1;
 
 	if ((pin = _getModeToGpio(lib->mode, pin)) < 0)
-		return;
+		return -1;
 
 	origPin = pin;
 	bank = pin / 32;
@@ -291,17 +291,19 @@ static void _pinMode (int pin, int mode)
 		*(gpio[bank] + (N1_GPIO_CON_OFFSET >> 2)) |=  (1 << gpioToShiftReg(pin));
 		break;
 	case SOFT_PWM_OUTPUT:
-		softPwmCreate (pin, 0, 100);
+		softPwmCreate (origPin, 0, 100);
 		break;
 	case SOFT_TONE_OUTPUT:
-		softToneCreate (pin);
+		softToneCreate (origPin);
 		break;
 	default:
 		msg(MSG_WARN, "%s : Unknown Mode %d\n", __func__, mode);
-		break;
+		return -1;
 	}
 
 	setClkState (pin, N1_CLK_DISABLE);
+
+	return 0;
 }
 
 /*----------------------------------------------------------------------------*/
@@ -312,10 +314,10 @@ static int _getAlt (int pin)
 	uint8_t ret = 0;
 
 	if (lib->mode == MODE_GPIO_SYS)
-		return	0;
+		return	-1;
 
 	if ((pin = _getModeToGpio(lib->mode, pin)) < 0)
-		return	2;
+		return	-1;
 
 	bank	= pin / 32;
 	group	= (pin - bank * 32) / 8;
@@ -347,16 +349,16 @@ static int _getAlt (int pin)
 }
 
 /*----------------------------------------------------------------------------*/
-static void _pullUpDnControl (int pin, int pud)
+static int _pullUpDnControl (int pin, int pud)
 {
 	uint32_t offset, target;
 	uint8_t	bank, group;
 
 	if (lib->mode == MODE_GPIO_SYS)
-		return	0;
+		return	-1;
 
 	if ((pin = _getModeToGpio(lib->mode, pin)) < 0)
-		return	2;
+		return	-1;
 
 	bank	= pin / 32;
 	group	= (pin - bank * 32) / 8;
@@ -441,6 +443,8 @@ static void _pullUpDnControl (int pin, int pud)
 	}
 
 	setClkState(pin, N1_CLK_DISABLE);
+
+	return 0;
 }
 
 /*----------------------------------------------------------------------------*/
@@ -451,16 +455,19 @@ static int _digitalRead (int pin)
 
 	if (lib->mode == MODE_GPIO_SYS) {
 		if (lib->sysFds[pin] == -1)
-			return LOW;
+			return -1;
 
 		lseek	(lib->sysFds[pin], 0L, SEEK_SET);
-		read	(lib->sysFds[pin], &c, 1);
+		if (read(lib->sysFds[pin], &c, 1) < 0) {
+			msg(MSG_WARN, "%s: Failed with reading from sysfs GPIO node. \n", __func__);
+			return -1;
+		}
 
 		return (c == '0') ? LOW : HIGH;
 	}
 
 	if ((pin = _getModeToGpio(lib->mode, pin)) < 0)
-		return	0;
+		return	-1;
 
 	bank = pin / 32;
 	setClkState(pin, N1_CLK_ENABLE);
@@ -472,7 +479,7 @@ static int _digitalRead (int pin)
 }
 
 /*----------------------------------------------------------------------------*/
-static void _digitalWrite (int pin, int value)
+static int _digitalWrite (int pin, int value)
 {
 	int bank;
 
@@ -490,11 +497,11 @@ static void _digitalWrite (int pin, int value)
 					__func__, strerror(errno), pin + N1_GPIO_PIN_BASE);
 			}
 		}
-		return;
+		return -1;
 	}
 
 	if ((pin = _getModeToGpio(lib->mode, pin)) < 0)
-		return;
+		return -1;
 
 	bank = pin / 32;
 	setClkState(pin, N1_CLK_ENABLE);
@@ -511,43 +518,58 @@ static void _digitalWrite (int pin, int value)
 	}
 
 	setClkState(pin, N1_CLK_DISABLE);
+
+	return 0;
 }
 
 /*----------------------------------------------------------------------------*/
 static int _analogRead (int pin)
 {
-	unsigned char value[5] = {0,};
+	char value[5] = {0,};
 
 	if (lib->mode == MODE_GPIO_SYS)
-		return	0;
+		return	-1;
 
 	/* wiringPi ADC number = pin 25, pin 29 */
 	switch (pin) {
+#if defined(ARDUINO)
+	/* To work with physical analog channel numbering */
+	case	1:	case	25:
+		pin = 0;
+	break;
+	case	0:	case	29:
+		pin = 1;
+	break;
+#else
 	case	0:	case	25:
 		pin = 0;
 	break;
 	case	1:	case	29:
 		pin = 1;
 	break;
+#endif
 	default:
 		return	0;
 	}
 	if (adcFds [pin] == -1)
 		return 0;
 
-	lseek (adcFds [pin], 0L, SEEK_SET);
-	read  (adcFds [pin], &value[0], 4);
+	lseek(adcFds [pin], 0L, SEEK_SET);
+	if (read(adcFds [pin], &value[0], 4) < 0) {
+		msg(MSG_WARN, "%s: Error occurs when it reads from ADC file descriptor. \n", __func__);
+		return -1;
+	}
 
 	return	atoi(value);
 }
 
 /*----------------------------------------------------------------------------*/
-static void _digitalWriteByte (const int value)
+static int _digitalWriteByte (const unsigned int value)
 {
 	union	reg_bitfield	gpioBits1;
 
 	if (lib->mode == MODE_GPIO_SYS) {
-		return;
+		return -1;
 	}
 
 	// Enable clock for GPIO 1 bank
@@ -577,6 +599,8 @@ static void _digitalWriteByte (const int value)
 	*(gpio[1] + (N1_GPIO_SET_OFFSET >> 2)) = gpioBits1.wvalue;
 
 	setClkState(32, N1_CLK_DISABLE);
+
+	return 0;
 }
 
 /*----------------------------------------------------------------------------*/
@@ -628,90 +652,98 @@ static unsigned int _digitalReadByte (void)
 /*----------------------------------------------------------------------------*/
 static void init_gpio_mmap (void)
 {
-	int fd;
+	int fd = -1;
+	void *mapped_cru[2], *mapped_grf[2], *mapped_gpio[5];
 
 	/* GPIO mmap setup */
 	if (!getuid()) {
 		if ((fd = open ("/dev/mem", O_RDWR | O_SYNC | O_CLOEXEC) ) < 0)
-			return msg (MSG_ERR,
+			msg (MSG_ERR,
 				"wiringPiSetup: Unable to open /dev/mem: %s\n",
 				strerror (errno));
 	} else {
 		if (access("/dev/gpiomem",0) == 0) {
 			if ((fd = open ("/dev/gpiomem", O_RDWR | O_SYNC | O_CLOEXEC) ) < 0)
-				return msg (MSG_ERR,
+				msg (MSG_ERR,
 					"wiringPiSetup: Unable to open /dev/gpiomem: %s\n",
 					strerror (errno));
 		} else
-			return msg (MSG_ERR,
+			msg (MSG_ERR,
 				"wiringPiSetup: /dev/gpiomem doesn't exist. Please try again with sudo.\n");
 	}
 
-	// GPIO{0, 1}
-	//#define ODROIDN1_PMUCRU_BASE	0xFF750000
-	cru[0] = (uint32_t *)mmap(0, BLOCK_SIZE, PROT_READ|PROT_WRITE,
-				MAP_SHARED, fd, N1_PMUCRU_BASE) ;
+	if (fd < 0) {
+		msg(MSG_ERR, "wiringPiSetup: Cannot open memory area for GPIO use. \n");
+	} else {
+		// GPIO{0, 1}
+		//#define ODROIDN1_PMUCRU_BASE	0xFF750000
+		mapped_cru[0] = mmap(0, BLOCK_SIZE, PROT_READ|PROT_WRITE, MAP_SHARED, fd, N1_PMUCRU_BASE);
 
-	// GPIO{2, 3, 4}
-	//#define ODROIDN1_CRU_BASE	0xFF760000
-	cru[1] = (uint32_t *)mmap(0, BLOCK_SIZE, PROT_READ|PROT_WRITE,
-				MAP_SHARED, fd, N1_CRU_BASE) ;
+		// GPIO{2, 3, 4}
+		//#define ODROIDN1_CRU_BASE	0xFF760000
+		mapped_cru[1] = mmap(0, BLOCK_SIZE, PROT_READ|PROT_WRITE, MAP_SHARED, fd, N1_CRU_BASE);
 
-	// GPIO{0, 1}
-	//#define ODROIDN1_PMU_BASE	0xFF320000
-	grf[0] = (uint32_t *)mmap(0, N1_GRF_BLOCK_SIZE, PROT_READ|PROT_WRITE,
-				MAP_SHARED, fd, N1_PMUGRF_BASE) ;
+		// GPIO{0, 1}
+		//#define ODROIDN1_PMU_BASE	0xFF320000
+		mapped_grf[0] = mmap(0, N1_GRF_BLOCK_SIZE, PROT_READ|PROT_WRITE, MAP_SHARED, fd, N1_PMUGRF_BASE);
 
-	// GPIO{2, 3, 4}
-	//#define ODROIDN1_GRF_BASE	0xFF770000
-	grf[1] = (uint32_t *)mmap(0, N1_GRF_BLOCK_SIZE, PROT_READ|PROT_WRITE,
-				MAP_SHARED, fd, N1_GRF_BASE) ;
+		// GPIO{2, 3, 4}
+		//#define ODROIDN1_GRF_BASE	0xFF770000
+		mapped_grf[1] = mmap(0, N1_GRF_BLOCK_SIZE, PROT_READ|PROT_WRITE, MAP_SHARED, fd, N1_GRF_BASE);
 
-	// GPIO1_A.	0,1,2,3,4,7
-	// GPIO1_B.	0,1,2,3,4,5
-	// GPIO1_C.	2,4,5,6
-	// GPIO1_D.	0
-	//#define ODROIDN1_GPIO1_BASE	0xFF730000
-	gpio[1] = (uint32_t *)mmap(0, BLOCK_SIZE, PROT_READ|PROT_WRITE,
-				MAP_SHARED, fd, N1_GPIO_1_BASE) ;
+		// GPIO1_A.	0,1,2,3,4,7
+		// GPIO1_B.	0,1,2,3,4,5
+		// GPIO1_C.	2,4,5,6
+		// GPIO1_D.	0
+		//#define ODROIDN1_GPIO1_BASE	0xFF730000
+		mapped_gpio[1] = mmap(0, BLOCK_SIZE, PROT_READ|PROT_WRITE, MAP_SHARED, fd, N1_GPIO_1_BASE);
 
-	// GPIO2_C.	0_B,1_B
-	//#define ODROIDN1_GPIO2_BASE	0xFF780000
-	gpio[2] = (uint32_t *)mmap(0, BLOCK_SIZE, PROT_READ|PROT_WRITE,
-				MAP_SHARED, fd, N1_GPIO_2_BASE) ;
+		// GPIO2_C.	0_B,1_B
+		//#define ODROIDN1_GPIO2_BASE	0xFF780000
+		mapped_gpio[2] = mmap(0, BLOCK_SIZE, PROT_READ|PROT_WRITE, MAP_SHARED, fd, N1_GPIO_2_BASE);
 
-	// GPIO4_C.	5,6
-	// GPIO4_D.	0,4,5,6
-	//#define ODROIDN1_GPIO4_BASE	0xFF790000
-	gpio[4] = (uint32_t *)mmap(0, BLOCK_SIZE, PROT_READ|PROT_WRITE,
-				MAP_SHARED, fd, N1_GPIO_4_BASE) ;
+		// GPIO4_C.	5,6
+		// GPIO4_D.	0,4,5,6
+		//#define ODROIDN1_GPIO4_BASE	0xFF790000
+		mapped_gpio[4] = mmap(0, BLOCK_SIZE, PROT_READ|PROT_WRITE, MAP_SHARED, fd, N1_GPIO_4_BASE);
 
-	// Reserved
-	gpio[0] = (uint32_t *)mmap(0, BLOCK_SIZE, PROT_READ|PROT_WRITE,
-				MAP_SHARED, fd, N1_GPIO_0_BASE) ;
-	gpio[3] = (uint32_t *)mmap(0, BLOCK_SIZE, PROT_READ|PROT_WRITE,
-				MAP_SHARED, fd, N1_GPIO_3_BASE) ;
+		// Reserved
+		mapped_gpio[0] = mmap(0, BLOCK_SIZE, PROT_READ|PROT_WRITE, MAP_SHARED, fd, N1_GPIO_0_BASE);
+		mapped_gpio[3] = mmap(0, BLOCK_SIZE, PROT_READ|PROT_WRITE, MAP_SHARED, fd, N1_GPIO_3_BASE);
 
-	if (((int32_t)cru[0] == -1) || ((int32_t)cru[1] == -1)) {
-		return msg (MSG_ERR,
-			"wiringPiSetup: mmap (CRU) failed: %s\n",
-			strerror (errno));
-	}
+		if ((mapped_cru[0] == MAP_FAILED) || (mapped_cru[1] == MAP_FAILED)) {
+			msg (MSG_ERR,
+				"wiringPiSetup: mmap (CRU) failed: %s\n",
+				strerror (errno));
+		} else {
+			cru[0] = (uint32_t *) mapped_cru[0];
+			cru[1] = (uint32_t *) mapped_cru[1];
+		}
 
-	if (((int32_t)grf[0] == -1) || ((int32_t)grf[1] == -1)) {
-		return msg (MSG_ERR,
-			"wiringPiSetup: mmap (GRF) failed: %s\n",
-			strerror (errno));
-	}
+		if ((mapped_grf[0] == MAP_FAILED) || (mapped_grf[1] == MAP_FAILED)) {
+			msg (MSG_ERR,
+				"wiringPiSetup: mmap (GRF) failed: %s\n",
+				strerror (errno));
+		} else {
+			grf[0] = (uint32_t *) mapped_grf[0];
+			grf[1] = (uint32_t *) mapped_grf[1];
+		}
 
-	if (	((int32_t)gpio[0] == -1) ||
-		((int32_t)gpio[1] == -1) ||
-		((int32_t)gpio[2] == -1) ||
-		((int32_t)gpio[3] == -1) ||
-		((int32_t)gpio[4] == -1)) {
-		return msg (MSG_ERR,
-			"wiringPiSetup: mmap (GPIO) failed: %s\n",
-			strerror (errno));
+		if (	(mapped_gpio[0] == MAP_FAILED) ||
+			(mapped_gpio[1] == MAP_FAILED) ||
+			(mapped_gpio[2] == MAP_FAILED) ||
+			(mapped_gpio[3] == MAP_FAILED) ||
+			(mapped_gpio[4] == MAP_FAILED)) {
+			msg (MSG_ERR,
+				"wiringPiSetup: mmap (GPIO) failed: %s\n",
+				strerror (errno));
+		} else {
+			gpio[0] = (uint32_t *) mapped_gpio[0];
+			gpio[1] = (uint32_t *) mapped_gpio[1];
+			gpio[2] = (uint32_t *) mapped_gpio[2];
+			gpio[3] = (uint32_t *) mapped_gpio[3];
+			gpio[4] = (uint32_t *) mapped_gpio[4];
+		}
 	}
 }
 

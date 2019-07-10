@@ -28,6 +28,7 @@
 #include <termios.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <errno.h>
 #include <sys/ioctl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -155,7 +156,8 @@ void serialClose (const int fd)
 
 void serialPutchar (const int fd, const unsigned char c)
 {
-  write (fd, &c, 1) ;
+  if (write(fd, &c, 1) < 0)
+    fprintf(stderr, "Unable to send to the opened serial device: %s \n", strerror(errno));
 }
 
 
@@ -167,7 +169,8 @@ void serialPutchar (const int fd, const unsigned char c)
 
 void serialPuts (const int fd, const char *s)
 {
-  write (fd, s, strlen (s)) ;
+  if (write(fd, s, strlen(s)) < 0)
+    fprintf(stderr, "Unable to send to the opened serial device: %s \n", strerror(errno));
 }
 
 /*

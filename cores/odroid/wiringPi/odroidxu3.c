@@ -88,7 +88,7 @@ static const int phyToGpio[64] = {
 //
 /*----------------------------------------------------------------------------*/
 /* ADC file descriptor */
-static char *adcFds[2];
+static int adcFds[2];
 
 /* GPIO mmap control */
 static volatile uint32_t *gpio, *gpio1;
@@ -99,7 +99,6 @@ static struct libodroid	*lib = NULL;
 /*----------------------------------------------------------------------------*/
 // Function prototype define
 /*----------------------------------------------------------------------------*/
-static int	gpioToGPSETReg	(int pin);
 static int	gpioToGPLEVReg	(int pin);
 static int	gpioToPUPDReg	(int pin);
 static int	gpioToShiftReg	(int pin);
@@ -110,16 +109,16 @@ static int	gpioToDSReg	(int pin);
 // wiringPi core function
 /*----------------------------------------------------------------------------*/
 static int		_getModeToGpio		(int mode, int pin);
-static void		_setPadDrive		(int pin, int value);
+static int		_setPadDrive		(int pin, int value);
 static int		_getPadDrive		(int pin);
-static void		_pinMode		(int pin, int mode);
+static int		_pinMode		(int pin, int mode);
 static int		_getAlt			(int pin);
 static int		_getPUPD		(int pin);
-static void		_pullUpDnControl	(int pin, int pud);
+static int		_pullUpDnControl	(int pin, int pud);
 static int		_digitalRead		(int pin);
-static void		_digitalWrite		(int pin, int value);
+static int		_digitalWrite		(int pin, int value);
 static int		_analogRead		(int pin);
-static void		_digitalWriteByte	(const int value);
+static int		_digitalWriteByte	(const unsigned int value);
 static unsigned int	_digitalReadByte	(void);
 
 /*----------------------------------------------------------------------------*/
@@ -130,31 +129,6 @@ static 	void init_adc_fds	(void);
 	void init_odroidxu3 	(struct libodroid *libwiring);
 
 /*----------------------------------------------------------------------------*/
-/*----------------------------------------------------------------------------*/
-//
-// offset to the GPIO Set regsiter
-//
-/*----------------------------------------------------------------------------*/
-static int gpioToGPSETReg (int pin)
-{
-	switch (pin) {
-	case	XU3_GPIO_X1_START...XU3_GPIO_X1_END:
-		return  (XU3_GPIO_X1_DAT_OFFSET >> 2);
-	case	XU3_GPIO_X2_START...XU3_GPIO_X2_END:
-		return  (XU3_GPIO_X2_DAT_OFFSET >> 2);
-	case	XU3_GPIO_X3_START...XU3_GPIO_X3_END:
-		return  (XU3_GPIO_X3_DAT_OFFSET >> 2);
-	case	XU3_GPIO_A0_START...XU3_GPIO_A0_END:
-		return  (XU3_GPIO_A0_DAT_OFFSET >> 2);
-	case	XU3_GPIO_A2_START...XU3_GPIO_A2_END:
-		return  (XU3_GPIO_A2_DAT_OFFSET >> 2);
-	case	XU3_GPIO_B3_START...XU3_GPIO_B3_END:
-		return  (XU3_GPIO_B3_DAT_OFFSET >> 2);
-	default:
-		break;
-	}
-	return	-1;
-}
 
 /*----------------------------------------------------------------------------*/
 //
@@ -310,19 +284,19 @@ static int _getModeToGpio (int mode, int pin)
 }
 
 /*----------------------------------------------------------------------------*/
-static void _setPadDrive (int pin, int value)
+static int _setPadDrive (int pin, int value)
 {
 	int ds, shift;
 
 	if (lib->mode == MODE_GPIO_SYS)
-		return;
+		return -1;
 
 	if ((pin = _getModeToGpio(lib->mode, pin)) < 0)
-		return;
+		return -1;
 
 	if (value < 0 || value > 3) {
 		msg(MSG_WARN, "%s : Invalid value %d (Must be 0 ~ 3)\n", __func__, value);
-		return;
+		return -1;
 	}
 
 	ds    = gpioToDSReg(pin);
@@ -335,6 +309,8 @@ static void _setPadDrive (int pin, int value)
 		*(gpio1 + ds) &= ~(0b11 << shift);
 		*(gpio1 + ds) |= (value << shift);
 	}
+
+	return 0;
 }
 
 /*----------------------------------------------------------------------------*/
@@ -343,10 +319,10 @@ static int _getPadDrive (int pin)
 	int ds, shift;
 
 	if (lib->mode == MODE_GPIO_SYS)
-		return;
+		return -1;
 
 	if ((pin = _getModeToGpio(lib->mode, pin)) < 0)
-		return;
+		return -1;
 
 	ds    = gpioToDSReg(pin);
 	shift = gpioToShiftReg(pin) << 1;
@@ -358,15 +334,15 @@ static int _getPadDrive (int pin)
 }
 
 /*----------------------------------------------------------------------------*/
-static void _pinMode (int pin, int mode)
+static int _pinMode (int pin, int mode)
 {
 	int fsel, shift, origPin = pin;
 
 	if (lib->mode == MODE_GPIO_SYS)
-		return;
+		return -1;
 
 	if ((pin = _getModeToGpio(lib->mode, pin)) < 0)
-		return;
+		return -1;
 
 	softPwmStop  (origPin);
 	softToneStop (origPin);
@@ -380,7 +356,7 @@ static void _pinMode (int pin, int mode)
 			*(gpio  + fsel) &= ~(0xF << shift);
 		else
 			*(gpio1 + fsel) &= ~(0xF << shift);
-	break;
+		break;
 	case	OUTPUT:
 		if(pin < 100) {
 			*(gpio  + fsel) &= ~(0xF << shift);
@@ -389,17 +365,19 @@ static void _pinMode (int pin, int mode)
 			*(gpio1 + fsel) &= ~(0xF << shift);
 			*(gpio1 + fsel) |=  (0x1 << shift);
 		}
-	break;
+		break;
 	case	SOFT_PWM_OUTPUT:
-		softPwmCreate (pin, 0, 100);
-	break;
+		softPwmCreate (origPin, 0, 100);
+		break;
 	case	SOFT_TONE_OUTPUT:
-		softToneCreate (pin);
-	break;
+		softToneCreate (origPin);
+		break;
 	default:
 		msg(MSG_WARN, "%s : Unknown Mode %d\n", __func__, mode);
-	break;
+		return -1;
 	}
+
+	return 0;
 }
 
 /*----------------------------------------------------------------------------*/
@@ -408,10 +386,10 @@ static int _getAlt (int pin)
 	int fsel, shift, mode;
 
 	if (lib->mode == MODE_GPIO_SYS)
-		return	0;
+		return	-1;
 
 	if ((pin = _getModeToGpio(lib->mode, pin)) < 0)
-		return	2;
+		return	-1;
 
 	fsel  = gpioToGPFSELReg(pin);
 	shift = gpioToShiftReg(pin) << 2;
@@ -431,10 +409,10 @@ static int _getPUPD (int pin)
 	int pupd, shift, pull;
 
 	if (lib->mode == MODE_GPIO_SYS)
-		return;
+		return -1;
 
 	if ((pin = _getModeToGpio(lib->mode, pin)) < 0)
-		return;
+		return -1;
 
 	pupd  = gpioToPUPDReg(pin);
 	shift = gpioToShiftReg(pin) << 1;
@@ -449,15 +427,15 @@ static int _getPUPD (int pin)
 }
 
 /*----------------------------------------------------------------------------*/
-static void _pullUpDnControl (int pin, int pud)
+static int _pullUpDnControl (int pin, int pud)
 {
 	int shift = 0;
 
 	if (lib->mode == MODE_GPIO_SYS)
-		return;
+		return -1;
 
 	if ((pin = _getModeToGpio(lib->mode, pin)) < 0)
-		return;
+		return -1;
 
 	shift = gpioToShiftReg(pin) << 1;
 
@@ -482,6 +460,8 @@ static void _pullUpDnControl (int pin, int pud)
 		else
 			*(gpio1 + gpioToPUPDReg(pin)) &= ~(0x3 << shift);
 	}
+
+	return 0;
 }
 
 /*----------------------------------------------------------------------------*/
@@ -491,16 +471,19 @@ static int _digitalRead (int pin)
 
 	if (lib->mode == MODE_GPIO_SYS) {
 		if (lib->sysFds[pin] == -1)
-			return LOW ;
+			return -1;
 
 		lseek	(lib->sysFds[pin], 0L, SEEK_SET);
-		read	(lib->sysFds[pin], &c, 1);
+		if (read(lib->sysFds[pin], &c, 1) < 0) {
+			msg(MSG_WARN, "%s: Failed with reading from sysfs GPIO node. \n", __func__);
+			return -1;
+		}
 
 		return	(c == '0') ? LOW : HIGH;
 	}
 
 	if ((pin = _getModeToGpio(lib->mode, pin)) < 0)
-		return	0;
+		return	-1;
 
 	if (pin < 100)
 		return	*(gpio  + gpioToGPLEVReg(pin)) & (1 << gpioToShiftReg(pin)) ? HIGH : LOW;
@@ -509,20 +492,23 @@ static int _digitalRead (int pin)
 }
 
 /*----------------------------------------------------------------------------*/
-static void _digitalWrite (int pin, int value)
+static int _digitalWrite (int pin, int value)
 {
 	if (lib->mode == MODE_GPIO_SYS) {
 		if (lib->sysFds[pin] != -1) {
-			if (value == LOW)
-				write (lib->sysFds[pin], "0\n", 2);
-			else
-				write (lib->sysFds[pin], "1\n", 2);
+			if (value == LOW) {
+				if (write(lib->sysFds[pin], "0\n", 2) < 0)
+					msg(MSG_WARN, "%s: Failed with reading from sysfs GPIO node. \n", __func__);
+			} else {
+				if (write(lib->sysFds[pin], "1\n", 2) < 0)
+					msg(MSG_WARN, "%s: Failed with reading from sysfs GPIO node. \n", __func__);
+			}
 		}
-		return;
+		return -1;
 	}
 
 	if ((pin = _getModeToGpio(lib->mode, pin)) < 0)
-		return;
+		return -1;
 
 	if (pin < 100) {
 		if (value == LOW)
@@ -535,43 +521,58 @@ static void _digitalWrite (int pin, int value)
 		else
 			*(gpio1 + gpioToGPLEVReg(pin)) |=  (1 << gpioToShiftReg(pin));
 	}
+
+	return 0;
 }
 
 /*----------------------------------------------------------------------------*/
 static int _analogRead (int pin)
 {
-	unsigned char value[5] = {0,};
+	char value[5] = {0,};
 
 	if (lib->mode == MODE_GPIO_SYS)
-		return	0;
+		return	-1;
 
 	/* wiringPi ADC number = pin 25, pin 29 */
 	switch (pin) {
+#if defined(ARDUINO)
+	/* To work with physical analog channel numbering */
+	case	0:	case	25:
+		pin = 0;
+	break;
+	case	3:	case	29:
+		pin = 1;
+	break;
+#else
 	case	0:	case	25:
 		pin = 0;
 	break;
 	case	1:	case	29:
 		pin = 1;
 	break;
+#endif
 	default:
 		return	0;
 	}
 	if (adcFds [pin] == -1)
 		return 0;
 
-	lseek (adcFds [pin], 0L, SEEK_SET);
-	read  (adcFds [pin], &value[0], 4);
+	lseek(adcFds [pin], 0L, SEEK_SET);
+	if (read(adcFds [pin], &value[0], 4) < 0) {
+		msg(MSG_WARN, "%s: Error occurs when it reads from ADC file descriptor. \n", __func__);
+		return -1;
+	}
 
 	return	atoi(value);
 }
 
 /*----------------------------------------------------------------------------*/
-static void _digitalWriteByte (const int value)
+static int _digitalWriteByte (const unsigned int value)
 {
 	union	reg_bitfield	gpx1, gpx2, gpa0;
 
 	if (lib->mode == MODE_GPIO_SYS) {
-		return;
+		return -1;
 	}
 	/* Read data register */
 	gpx1.wvalue = *(gpio  + (XU3_GPIO_X1_DAT_OFFSET >> 2));
@@ -599,6 +600,8 @@ static void _digitalWriteByte (const int value)
 	*(gpio  + (XU3_GPIO_X1_DAT_OFFSET >> 2)) = gpx1.wvalue;
 	*(gpio  + (XU3_GPIO_X2_DAT_OFFSET >> 2)) = gpx2.wvalue;
 	*(gpio1 + (XU3_GPIO_A0_DAT_OFFSET >> 2)) = gpa0.wvalue;
+
+	return 0;
 }
 
 /*----------------------------------------------------------------------------*/
@@ -646,35 +649,41 @@ static unsigned int _digitalReadByte (void)
 /*----------------------------------------------------------------------------*/
 static void init_gpio_mmap (void)
 {
-	int	fd;
+	int fd = -1;
+	void *mapped[2];
 
 	/* GPIO mmap setup */
 	if (!getuid()) {
 		if ((fd = open ("/dev/mem", O_RDWR | O_SYNC | O_CLOEXEC) ) < 0)
-			return msg (MSG_ERR,
+			msg (MSG_ERR,
 				"wiringPiSetup: Unable to open /dev/mem: %s\n",
 				strerror (errno));
 	} else {
 		if (access("/dev/gpiomem",0) == 0) {
 			if ((fd = open ("/dev/gpiomem", O_RDWR | O_SYNC | O_CLOEXEC) ) < 0)
-				return msg (MSG_ERR,
+				msg (MSG_ERR,
 					"wiringPiSetup: Unable to open /dev/gpiomem: %s\n",
 					strerror (errno));
 		} else
-			return msg (MSG_ERR,
+			msg (MSG_ERR,
 				"wiringPiSetup: /dev/gpiomem doesn't exist. Please try again with sudo.\n");
 	}
 
-	//#define ODROIDXU_GPX_BASE   0x13400000  // GPX0,1,2,3
-	gpio  = (uint32_t *)mmap(0, BLOCK_SIZE, PROT_READ|PROT_WRITE,
-				MAP_SHARED, fd, XU3_GPX_BASE) ;
-	//#define ODROIDXU_GPA_BASE   0x14010000  // GPA0,1,2, GPB0,1,2,3,4
-	gpio1 = (uint32_t *)mmap(0, BLOCK_SIZE, PROT_READ|PROT_WRITE,
-				MAP_SHARED, fd, XU3_GPA_BASE) ;
-	if (((int32_t)gpio == -1) || ((int32_t)gpio1 == -1))
-		return msg (MSG_ERR,
-			"wiringPiSetup: mmap (GPIO) failed: %s\n",
-			strerror (errno));
+	if (fd < 0) {
+		msg(MSG_ERR, "wiringPiSetup: Cannot open memory area for GPIO use. \n");
+	} else {
+		//#define ODROIDXU_GPX_BASE   0x13400000  // GPX0,1,2,3
+		mapped[0] = mmap(0, BLOCK_SIZE, PROT_READ|PROT_WRITE, MAP_SHARED, fd, XU3_GPX_BASE);
+		//#define ODROIDXU_GPA_BASE   0x14010000  // GPA0,1,2, GPB0,1,2,3,4
+		mapped[1] = mmap(0, BLOCK_SIZE, PROT_READ|PROT_WRITE, MAP_SHARED, fd, XU3_GPA_BASE);
+
+		if (mapped[0] == MAP_FAILED || mapped[1] == MAP_FAILED) {
+			msg(MSG_ERR, "wiringPiSetup: mmap (GPIO) failed: %s \n", strerror (errno));
+		} else {
+			gpio  = (uint32_t *) mapped[0];
+			gpio1 = (uint32_t *) mapped[1];
+		}
+	}
 }
 
 /*----------------------------------------------------------------------------*/

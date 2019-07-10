@@ -103,7 +103,9 @@ extern const char *piMakerNames    [16];
 extern const int   piMemorySize    [ 8];
 
 /*----------------------------------------------------------------------------*/
+#if !defined(ANDROID)
 #define	PAGE_SIZE		(4*1024)
+#endif
 #define	BLOCK_SIZE		(4*1024)
 
 /*----------------------------------------------------------------------------*/
@@ -123,16 +125,16 @@ struct libodroid
 
 	/* wiringPi core func */
 	int	(*getModeToGpio)	(int mode, int pin);
-	void	(*setPadDrive)		(int pin, int value);
+	int	(*setPadDrive)		(int pin, int value);
 	int	(*getPadDrive)		(int pin);
-	void	(*pinMode)		(int pin, int mode);
+	int	(*pinMode)		(int pin, int mode);
 	int	(*getAlt)		(int pin);
 	int	(*getPUPD)		(int pin);
-	void	(*pullUpDnControl)	(int pin, int pud);
+	int	(*pullUpDnControl)	(int pin, int pud);
 	int	(*digitalRead)		(int pin);
-	void	(*digitalWrite)		(int pin, int value);
+	int	(*digitalWrite)		(int pin, int value);
 	int	(*analogRead)		(int pin);
-	void	(*digitalWriteByte)	(const int value);
+	int	(*digitalWriteByte)	(const unsigned int value);
 	unsigned int (*digitalReadByte)	(void);
 
 	/* ISR Function pointer */
@@ -190,7 +192,7 @@ union	reg_bitfield {
 // wiringPiNodeStruct:
 //	This describes additional device nodes in the extended wiringPi
 //	2.0 scheme of things.
-//	It's a simple linked list for now, but will hopefully migrate to 
+//	It's a simple linked list for now, but will hopefully migrate to
 //	a binary tree for efficiency reasons - but then again, the chances
 //	of more than 1 or 2 devices being added are fairly slim, so who
 //	knows....
@@ -267,17 +269,17 @@ extern		int  wpiPinToGpio	(int wpiPin);
 extern		int  physPinToGpio	(int physPin);
 
 // Unsupported
-extern		void pinModeAlt		(int pin, int mode);
-extern		void analogWrite	(int pin, int value);
-extern		void pwmToneWrite	(int pin, int freq);
-extern		void pwmSetMode		(int mode);
-extern		void pwmSetRange	(unsigned int range);
-extern		void pwmSetClock	(int divisor);
-extern		void gpioClockSet	(int pin, int freq);
-extern unsigned int  digitalReadByte	(void);
-extern unsigned int  digitalReadByte2	(void);
-extern		void digitalWriteByte	(int value);
-extern		void digitalWriteByte2	(int value);
+extern		void pinModeAlt		(int pin, int mode) UNU;
+extern		void analogWrite	(int pin, int value) UNU;
+extern		void pwmToneWrite	(int pin, int freq) UNU;
+extern		void pwmSetMode		(int mode) UNU;
+extern		void pwmSetRange	(unsigned int range) UNU;
+extern		void pwmSetClock	(int divisor) UNU;
+extern		void gpioClockSet	(int pin, int freq) UNU;
+extern unsigned int  digitalReadByte	(void) UNU;
+extern unsigned int  digitalReadByte2	(void) UNU;
+extern		void digitalWriteByte	(int value) UNU;
+extern		void digitalWriteByte2	(int value) UNU;
 
 // Interrupt
 extern		int  waitForInterrupt	(int pin, int mS);
