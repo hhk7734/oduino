@@ -1,0 +1,8 @@
+README.md		/usr/share/arduino/hardware/odroid/
+boards.txt		/usr/share/arduino/hardware/odroid/
+platform.txt		/usr/share/arduino/hardware/odroid/
+programmers.txt		/usr/share/arduino/hardware/odroid/
+cores			/usr/share/arduino/hardware/odroid/
+libraries		/usr/share/arduino/hardware/odroid/
+tools			/usr/share/arduino/hardware/odroid/
+image			/usr/share/arduino/hardware/odroid/

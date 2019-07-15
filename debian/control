@@ -1,0 +1,17 @@
+Source: oduino
+Section: misc
+Priority: optional
+Maintainer: Hardkernel Co,. Ltd. <odroid@hardkernel.com>
+Uploaders: Hyeon-Ki Hong <hhk7734@gmail.com>,
+	Dongjin Kim <tobetter@gmail.com>
+Build-Depends: debhelper (>= 8.0.0)
+Standards-Version: 4.8
+Homepage: https://github.com/hhk7734
+
+Package: oduino
+Architecture: armhf arm64
+Depends: build-essential, arduino
+Description: Arduino device package for ODROID SBC
+ The 'oduino' is the package to install the device files
+ to run Arduino and run on ODROID SBCs, currently supporting
+ ODROID-XU4/ODROID-C1/ODROID-C2/ODROID-N2.
