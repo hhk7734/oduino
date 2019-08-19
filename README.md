@@ -15,8 +15,17 @@ $ sudo apt update && sudo apt upgrade -y && sudo apt autoremove -y
 ```
 
 ```bash
-$ sudo apt install -y git &&\
-  git clone https://github.com/hhk7734/oduino.git ~/Arduino/hardware/hardkernel/odroid
+$ sudo apt install -y git
+```
+
+```bash
+$ sudo git clone https://github.com/hardkernel/wiringPi /tmp/wiringPi &&\
+  cd /tmp/wiringPi &&\
+  ./build
+```
+
+```bash
+$ git clone https://github.com/hhk7734/oduino.git ~/Arduino/hardware/hardkernel/odroid
 ```
 
 - If you already opened the Arduino IDE, Close and reopen the Arduino IDE.
