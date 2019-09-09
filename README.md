@@ -4,24 +4,23 @@ Arduino core for the ODROID
 
 ## Installation
 
-- Install latest Arduino IDE for the Linux ARM from [www.arduino.cc/Main/Software](https://www.arduino.cc/en/Main/Software?target=_blank)
-- Installation Guide : [www.arduino.cc/Guide/Linux](https://www.arduino.cc/en/Guide/Linux?target=_blank)
+- Download latest Arduino IDE for the Linux ARM from [www.arduino.cc/Main/Software](https://www.arduino.cc/en/Main/Software?target=_blank)
   - ODROID C1/XU4 : ARM 32bit
   - ODROID C2/N2 : ARM 64bit
-- Open Terminal and execute   the following command (copy and paste the following command after $):
+- Installation Guide : [www.arduino.cc/Guide/Linux](https://www.arduino.cc/en/Guide/Linux?target=_blank)
+- Open Terminal and execute the following command (copy and paste the following command after $):
 
 ```bash
-$ sudo apt update && sudo apt upgrade -y && sudo apt autoremove -y
+$ sudo add-apt-repository ppa:hardkernel/ppa
 ```
 
 ```bash
-$ sudo apt install -y git
+$ sudo apt update
 ```
 
 ```bash
-$ sudo git clone https://github.com/hardkernel/wiringPi /tmp/wiringPi &&\
-  cd /tmp/wiringPi &&\
-  ./build
+$ sudo apt install -y build-essential git odroid-config \
+    odroid-wiringpi libwiringpi-dev
 ```
 
 ```bash
@@ -42,7 +41,7 @@ $ git clone https://github.com/hhk7734/oduino.git ~/Arduino/hardware/hardkernel/
 
 ## passwd
 
-If you don't want to input your passwd every upload, register user as a nopasswd user on the end of the sudoers file.
+If you don't want to input your password when uploading, register the user as the no-password user on the end of the sudoers file.
 
 ```bash
 $ sudo visudo
