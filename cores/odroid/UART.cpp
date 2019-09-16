@@ -28,19 +28,20 @@
 #include <wiringSerial.h>
 #include <unistd.h>
 #include <pthread.h>
-UartClass Serial( 0 );
-#if defined( ARDUINO_ODROID_N2 )
-UartClass Serial1( 1 );
-UartClass Serial2( 2 );
-#endif
-#if defined( ARDUINO_ODROID_XU3 ) || defined( ARDUINO_ODROID_XU4 )
-UartClass Serial1( 1 );
+
+UartClass Serial( NULL );
+
+#if defined( ARDUINO_ODROID_C2 ) || defined( ARDUINO_ODROID_N2 )
+UartClass Serial1( "/dev/ttyS1" );
 #endif
 
-UartClass::UartClass( uint8_t _uart_num )
-    : uart_num( _uart_num )
-{
-}
+#if defined( ARDUINO_ODROID_XU3 ) || defined( ARDUINO_ODROID_XU4 )
+UartClass Serial1( "/dev/ttySAC0" );
+#endif
+
+#if defined( ARDUINO_ODROID_N2 )
+UartClass Serial2( "/dev/ttyS2" );
+#endif
 
 const int BUFFER_SIZE = 256;
 char      buffer[BUFFER_SIZE];
@@ -48,11 +49,21 @@ uint16_t  buffer_head = 0;
 uint16_t  buffer_tail = 0;
 pthread_t stdin_thread;
 
+UartClass::UartClass( const char *_device )
+{
+    if( _device != NULL )
+    {
+        device = ( char * )malloc( sizeof( char ) * ( strlen( _device ) + 1 ) );
+        strcpy( device, _device );
+    }
+}
+
 void *stdin_thread_loop( void *arg )
 {
     for( ;; )
     {
         char temp = serialGetchar( STDIN_FILENO );
+
         if( temp == '\n' )
         {
             buffer[buffer_head] = '\r';
@@ -62,8 +73,10 @@ void *stdin_thread_loop( void *arg )
                 buffer_tail = ( buffer_tail + 1 ) % BUFFER_SIZE;
             }
         }
+
         buffer[buffer_head] = temp;
         buffer_head         = ( buffer_head + 1 ) % BUFFER_SIZE;
+
         if( buffer_head == buffer_tail )
         {
             buffer_tail = ( buffer_tail + 1 ) % BUFFER_SIZE;
@@ -73,39 +86,29 @@ void *stdin_thread_loop( void *arg )
 
 void UartClass::begin( unsigned long baudrate, uint16_t config )
 {
-    switch( uart_num )
+    if( device == NULL )
     {
-        case 0:
-            fd = STDOUT_FILENO;
-            pthread_create( &stdin_thread, NULL, stdin_thread_loop, NULL );
-            break;
-        case 1:
-#if defined( ARDUINO_ODROID_N2 )
-            fd = serialOpen( "/dev/ttyS1", baudrate );
-#elif defined( ARDUINO_ODROID_XU3 ) || defined( ARDUINO_ODROID_XU4 )
-            fd = serialOpen( "/dev/ttySAC0", baudrate );
-#endif
-            break;
-        case 2:
-            fd = serialOpen( "/dev/ttyS2", baudrate );
-            break;
-        default:
-            fd = -1;
-            break;
+        fd = STDOUT_FILENO;
+        pthread_create( &stdin_thread, NULL, stdin_thread_loop, NULL );
+    }
+    else
+    {
+        fd = serialOpen( device, baudrate );
     }
 }
 
 void UartClass::end()
 {
-    if( uart_num != 0 )
+    if( device != NULL )
     {
         serialClose( fd );
+        free( device );
     }
 }
 
 int UartClass::available( void )
 {
-    if( uart_num != 0 )
+    if( device != NULL )
     {
         return serialDataAvail( fd );
     }
@@ -118,7 +121,7 @@ int UartClass::peek( void ) {}
 
 int UartClass::read( void )
 {
-    if( uart_num != 0 )
+    if( device != NULL )
     {
         return serialGetchar( fd );
     }

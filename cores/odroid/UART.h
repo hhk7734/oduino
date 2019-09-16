@@ -31,9 +31,10 @@
 class UartClass : public HardwareSerial
 {
 public:
-    UartClass( uint8_t _uart_num );
+    UartClass( const char *_device );
+
     void           begin( unsigned long baudrate, uint16_t config );
-    void           begin( unsigned long baudrate ) { begin( baudrate, SERIAL_8N1 ); }
+    void           begin( unsigned long baudrate = 115200 ) { begin( baudrate, SERIAL_8N1 ); }
     void           end( void );
     virtual int    available( void );
     virtual int    peek( void );
@@ -49,21 +50,22 @@ public:
     virtual operator bool() { return true; }
 
 protected:
-    uint8_t uart_num;
-    int     fd;
+    char *device = NULL;
+    int   fd;
 };
 
 extern UartClass Serial;
 #define HAVE_HWSERIAL0
-#if defined( ARDUINO_ODROID_N2 )
+
+#if defined( ARDUINO_ODROID_C2 ) || defined( ARDUINO_ODROID_XU3 ) || defined( ARDUINO_ODROID_XU4 ) \
+    || defined( ARDUINO_ODROID_N2 )
 extern UartClass Serial1;
 #define HAVE_HWSERIAL1
+#endif
+
+#if defined( ARDUINO_ODROID_N2 )
 extern UartClass Serial2;
 #define HAVE_HWSERIAL2
-#endif
-#if defined( ARDUINO_ODROID_XU3 ) || defined( ARDUINO_ODROID_XU4 )
-extern UartClass Serial1;
-#define HAVE_HWSERIAL1
 #endif
 
 #endif    // _UART_CLASS_H_
