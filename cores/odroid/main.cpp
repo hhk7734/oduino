@@ -58,7 +58,7 @@ int main( void )
 
     Serial.println( "If you want to stop this program, please input 'Ctrl + C'" );
 
-    wiringPiSetup();
+    wiringPiSetupPhys();
 
     setup();
 
