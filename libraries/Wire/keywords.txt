@@ -26,6 +26,11 @@ onRequest	KEYWORD2
 #######################################
 
 Wire	KEYWORD2
+Wire1 KEYWORD2
+Wire2 KEYWORD2
+Wire3 KEYWORD2
+Wire4 KEYWORD2
+Wire5 KEYWORD2
 
 #######################################
 # Constants (LITERAL1)
