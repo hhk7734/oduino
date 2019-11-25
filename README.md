@@ -57,5 +57,5 @@ sudo visudo
 
 ```bash
 ...
-odroid ALL=(ALL) NOPASSWD:ALL
+odroid ALL=(ALL) NOPASSWD: ALL
 ```
