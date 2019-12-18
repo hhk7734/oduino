@@ -1,0 +1,4 @@
+[submodule "tools/tty0uart"]
+	path = tools/tty0uart
+	url = https://github.com/hhk7734/tty0uart.git
+	branch = oduino
