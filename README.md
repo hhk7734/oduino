@@ -22,7 +22,7 @@ Installation Guide and OS download link: <a href="https://wiki.odroid.com/gettin
 Open Terminal and execute the following command (copy and paste the following command to the termianl):
 
 ```bash
-sudo add-apt-repository -y ppa:hardkernel/ppa &&
+sudo add-apt-repository -y ppa:hardkernel/ppa &&\
 sudo apt update
 ```
 
@@ -32,7 +32,10 @@ sudo apt install -y build-essential git odroid-config \
 ```
 
 ```bash
-git clone https://github.com/hhk7734/oduino.git ~/Arduino/hardware/hardkernel/odroid
+git clone --recursive https://github.com/hhk7734/oduino.git \
+    ~/Arduino/hardware/hardkernel/odroid &&\
+cd ~/Arduino/hardware/hardkernel/odroid/tools/tty0uart &&\
+make && sudo make install
 ```
 
 If you already opened the Arduino IDE, Close and reopen the Arduino IDE.
