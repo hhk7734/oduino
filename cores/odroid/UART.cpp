@@ -29,13 +29,14 @@
 #include <unistd.h>
 #include <pthread.h>
 
-UartClass Serial( NULL );
+UartClass Console( NULL );
+
+// tty0uart - oduino
+UartClass Serial( "/dev/ttyhk0" );
 
 #if defined( ARDUINO_ODROID_C2 ) || defined( ARDUINO_ODROID_N2 )
 UartClass Serial1( "/dev/ttyS1" );
-#endif
-
-#if defined( ARDUINO_ODROID_XU3 ) || defined( ARDUINO_ODROID_XU4 )
+#elif defined( ARDUINO_ODROID_XU3 ) || defined( ARDUINO_ODROID_XU4 )
 UartClass Serial1( "/dev/ttySAC0" );
 #endif
 
@@ -117,6 +118,7 @@ int UartClass::available( void )
         return ( BUFFER_SIZE + buffer_head - buffer_tail ) % BUFFER_SIZE;
     }
 }
+
 int UartClass::peek( void ) {}
 
 int UartClass::read( void )

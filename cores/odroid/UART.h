@@ -54,6 +54,8 @@ protected:
     int   fd;
 };
 
+extern UartClass Console;
+
 extern UartClass Serial;
 #define HAVE_HWSERIAL0
 
