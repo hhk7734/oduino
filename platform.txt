@@ -53,7 +53,7 @@ recipe.ar.pattern="{compiler.path}{compiler.cross_compile}{compiler.ar.cmd}" {co
 recipe.c.combine.pattern="{compiler.path}{compiler.cross_compile}{compiler.combine.cmd}" {compiler.combine.flags} {compiler.combine.extra_flags} {object_files} {archive_file_path} "-L{build.path}" -o "{build.path}/{build.project_name}.out" {compiler.combine.libs}
 
 recipe.output.tmp_file={build.project_name}.out
-recipe.output.save_file={build.project_name}.{build.variant}.out
+recipe.output.save_file={build.project_name}.out
 
 ##############
 # ODROID tools
