@@ -5,6 +5,13 @@ import logging
 import os
 import sys
 
+import threading
+import queue
+import subprocess
+import shlex
+import fcntl
+import time
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 logging.basicConfig(
@@ -35,6 +42,7 @@ class UiMainWindow(tk.Frame):
         if len(sys.argv) > 1:
             self.quit_button["text"] = "QUIT\n" + sys.argv[1]
         else:
+            log.error("Failed to find executable file.")
             sys.exit()
         self.quit_button["fg"] = "red"
 
@@ -47,6 +55,9 @@ class MainWindow(UiMainWindow):
         super().__init__(master=master)
         self.setup_ui()
 
+        self.oduino = OduinoProcess(self)
+        self.oduino.start()
+
         '''
         기능
         bind, command
@@ -54,7 +65,53 @@ class MainWindow(UiMainWindow):
         self.quit_button.bind("<Button-1>", self.quit_oduino)
 
     def quit_oduino(self, event):
+        self.oduino.terminate_oduion()
         self.master.destroy()
+
+
+class OduinoProcess(threading.Thread):
+    def __init__(self, main):
+        super().__init__()
+        self.daemon = True
+        self.main = main
+        self._in_queue = queue.Queue()
+
+    def run(self):
+        command_line = sys.argv[1]
+        self.popen = subprocess.Popen(shlex.split(command_line),
+                                      stdin=subprocess.PIPE,
+                                      stdout=subprocess.PIPE,
+                                      stderr=subprocess.STDOUT)
+
+        fd = self.popen.stdout.fileno()
+        fl = fcntl.fcntl(fd, fcntl.F_GETFL)
+        fcntl.fcntl(fd, fcntl.F_SETFL, fl | os.O_NONBLOCK)
+
+        old_stdout = b''
+        while self.popen.poll() is None:
+            if not self._in_queue.empty():
+                stdin = self._in_queue.get()
+                log.debug("stdin: {}".format(stdin))
+                stdin = stdin + "\n"
+                self.popen.stdin.write(stdin.encode())
+
+            stdout = self.popen.stdout.readline()
+            if stdout != b'' and stdout != old_stdout:
+                old_stdout = stdout
+                stdout = stdout.decode()
+                log.debug("stdout: {}".format(stdout[:-1]))
+
+            time.sleep(0.1)
+
+        log.debug("Oduino subprocess finished.")
+
+    def write_stdin(self, msg):
+        self._in_queue.put(msg)
+
+    def terminate_oduion(self):
+        self.popen.terminate()
+        time.sleep(0.5)
+
 
 wpid = os.fork()
 if wpid == 0:
