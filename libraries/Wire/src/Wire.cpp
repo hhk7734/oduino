@@ -28,6 +28,7 @@
 #include <linux/i2c-dev.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
+#include <stdlib.h>    // exit()
 
 #if defined( ARDUINO_ODROID_C1 ) || defined( ARDUINO_ODROID_C2 ) || defined( ARDUINO_ODROID_XU3 ) \
     || defined( ARDUINO_ODROID_XU4 )
@@ -61,7 +62,7 @@ TwoWire::TwoWire( uint8_t _i2c_num )
 
 void TwoWire::begin( uint8_t slave_address )
 {
-    char device[11];
+    char device[15];
 
     device_address = slave_address;
 
@@ -71,10 +72,12 @@ void TwoWire::begin( uint8_t slave_address )
     {
         end();
     }
-    if( ( fd = open( device, O_RDWR ) ) < 0 )
+
+    fd = open( device, O_RDWR );
+    if( fd < 0 )
     {
         fprintf( stderr, "Unable to open %s : %s\n", device, strerror( errno ) );
-        exit( -1 );
+        exit( EXIT_FAILURE );
     }
 }
 

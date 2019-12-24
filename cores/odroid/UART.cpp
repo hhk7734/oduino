@@ -28,6 +28,9 @@
 #include <wiringSerial.h>
 #include <unistd.h>
 #include <pthread.h>
+#include <stdio.h>    // sprintf(), fprintf()
+#include <errno.h>
+#include <stdlib.h>    // exit()
 
 UartClass Console( NULL );
 
@@ -51,6 +54,7 @@ uint16_t  buffer_tail = 0;
 pthread_t stdin_thread;
 
 UartClass::UartClass( const char *_device )
+    : fd( -1 )
 {
     if( _device != NULL )
     {
@@ -89,12 +93,25 @@ void UartClass::begin( unsigned long baudrate, uint16_t config )
 {
     if( device == NULL )
     {
-        fd = STDOUT_FILENO;
-        pthread_create( &stdin_thread, NULL, stdin_thread_loop, NULL );
+        if( fd < 0 )
+        {
+            fd = STDOUT_FILENO;
+            pthread_create( &stdin_thread, NULL, stdin_thread_loop, NULL );
+        }
     }
     else
     {
+        if( fd > 0 )
+        {
+            end();
+        }
+
         fd = serialOpen( device, baudrate );
+        if( fd < 0 )
+        {
+            fprintf( stderr, "Unable to open %s : %s\n", device, strerror( errno ) );
+            exit( EXIT_FAILURE );
+        }
     }
 }
 
