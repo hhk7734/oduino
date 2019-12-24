@@ -1,3 +1,3 @@
-terminal.name=Terminal
-terminal.program.tool=bash
-terminal.program.extra_params=
+bridge.name=Bridge
+bridge.program.tool=bridge
+bridge.program.extra_params=

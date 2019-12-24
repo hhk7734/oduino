@@ -5,7 +5,7 @@
 odroid_c1.name=ODROID C1
 odroid_c1.build.core=odroid
 odroid_c1.build.board=ODROID_C1
-odroid_c1.upload.tool=bash
+odroid_c1.upload.tool=bridge
 odroid_c1.compiler.cross_compile=arm-linux-gnueabihf-
 
 ###########
@@ -15,7 +15,7 @@ odroid_c1.compiler.cross_compile=arm-linux-gnueabihf-
 odroid_c2.name=ODROID C2
 odroid_c2.build.core=odroid
 odroid_c2.build.board=ODROID_C2
-odroid_c2.upload.tool=bash
+odroid_c2.upload.tool=bridge
 odroid_c2.compiler.cross_compile=aarch64-linux-gnu-
 
 ############
@@ -25,7 +25,7 @@ odroid_c2.compiler.cross_compile=aarch64-linux-gnu-
 odroid_xu3.name=ODROID XU3
 odroid_xu3.build.core=odroid
 odroid_xu3.build.board=ODROID_XU3
-odroid_xu3.upload.tool=bash
+odroid_xu3.upload.tool=bridge
 odroid_xu3.compiler.cross_compile=arm-linux-gnueabihf-
 
 ############
@@ -35,7 +35,7 @@ odroid_xu3.compiler.cross_compile=arm-linux-gnueabihf-
 odroid_xu4.name=ODROID XU4
 odroid_xu4.build.core=odroid
 odroid_xu4.build.board=ODROID_XU4
-odroid_xu4.upload.tool=bash
+odroid_xu4.upload.tool=bridge
 odroid_xu4.compiler.cross_compile=arm-linux-gnueabihf-
 
 ###########
@@ -45,5 +45,5 @@ odroid_xu4.compiler.cross_compile=arm-linux-gnueabihf-
 odroid_n2.name=ODROID N2
 odroid_n2.build.core=odroid
 odroid_n2.build.board=ODROID_N2
-odroid_n2.upload.tool=bash
+odroid_n2.upload.tool=bridge
 odroid_n2.compiler.cross_compile=aarch64-linux-gnu-
