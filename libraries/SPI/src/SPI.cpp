@@ -2,6 +2,9 @@
 
 #include <wiringPiSPI.h>
 #include <unistd.h>
+#include <stdio.h>    // sprintf(), fprintf()
+#include <errno.h>
+#include <stdlib.h>    // exit()
 
 SPIClass  SPI0( 0 );
 SPIClass &SPI = SPI0;
@@ -18,16 +21,31 @@ void SPIClass::begin( const char *device, uint32_t speed, uint8_t mode )
     {
         end();
     }
+
     fd = wiringPiSPISetupInterface( device, channel, speed, mode );
+    if( fd < 0 )
+    {
+        fprintf( stderr, "Unable to open %s : %s\n", device, strerror( errno ) );
+        exit( EXIT_FAILURE );
+    }
 }
 
 void SPIClass::begin( uint32_t speed, uint8_t mode )
 {
+    char device[20];
+    sprintf( device, "/dev/spidevX.%d", channel );
+
     if( fd > 0 )
     {
         end();
     }
+
     fd = wiringPiSPISetupMode( channel, speed, mode );
+    if( fd < 0 )
+    {
+        fprintf( stderr, "Unable to open %s : %s\n", device, strerror( errno ) );
+        exit( EXIT_FAILURE );
+    }
 }
 
 void SPIClass::end( void )
