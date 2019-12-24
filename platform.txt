@@ -64,4 +64,4 @@ tools.bridge.cmd=bridge.py
 
 tools.bridge.program.params.verbose=
 tools.bridge.program.params.quiet=
-tools.bridge.program.pattern=sh "{path}/{cmd}" {build.path}/{build.project_name}.out
+tools.bridge.program.pattern="{path}/{cmd}" {build.path}/{build.project_name}.out
