@@ -88,7 +88,7 @@ class OduinoProcess(threading.Thread):
         fcntl.fcntl(fd, fcntl.F_SETFL, fl | os.O_NONBLOCK)
 
         old_stdout = b''
-        while self.popen.poll() is None:
+        while True:
             if not self._in_queue.empty():
                 stdin = self._in_queue.get()
                 log.debug("stdin: {}".format(stdin))
@@ -100,6 +100,17 @@ class OduinoProcess(threading.Thread):
                 old_stdout = stdout
                 stdout = stdout.decode()
                 log.debug("stdout: {}".format(stdout[:-1]))
+
+            if self.popen.poll() is not None:
+                for _ in range(10):
+                    stdout = self.popen.stdout.readline()
+                    if stdout != b'' and stdout != old_stdout:
+                        old_stdout = stdout
+                        stdout = stdout.decode()
+                        log.debug("stdout: {}".format(stdout[:-1]))
+
+                    time.sleep(0.2)
+                break
 
             time.sleep(0.1)
 
