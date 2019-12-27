@@ -1,0 +1,5 @@
+# /dev/spidev
+KERNEL=="spidev*", GROUP="spi", MODE="0660"
+
+# /dev/i2c-
+KERNEL=="i2c-*", GROUP="i2c", MODE="0660"
