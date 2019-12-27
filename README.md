@@ -34,16 +34,3 @@ If you already opened the Arduino IDE, Close and reopen the Arduino IDE.
 * Tools -> Board: -> ODROID Series
 * Tools -> Port: -> /dev/ttyHK0
 * Tools -> Programmer: -> Bridge
-
-## Setup NOPASSWD
-
-If you don't want to input your password when uploading, register the user as the no-password user on the end of the sudoers file.
-
-```bash
-sudo visudo
-```
-
-```bash
-...
-odroid ALL=(ALL) NOPASSWD: ALL
-```
