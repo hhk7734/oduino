@@ -26,6 +26,8 @@
 extern "C" {
 #endif
 
+const int LED_BUILTIN = 13;
+
 #define digitalPinToInterrupt( P ) ( P )
 
 #ifdef __cplusplus
