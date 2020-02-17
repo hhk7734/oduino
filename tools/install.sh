@@ -50,11 +50,14 @@ add-apt-repository -y ppa:hardkernel/ppa &&
 
 apt install -y build-essential \
     git \
-    odroid-config \
     odroid-wiringpi \
     libwiringpi-dev \
     python3 \
     python3-tk
+
+if ! [ -n "$(command -v odroid-config 2>/dev/null)" ]; then
+    apt install -y odroid-config
+fi
 
 printf "%s\nInstalling tty0uart.\n%s" "${ORANGE}${BOLD}" "${DEFAULT}"
 sleep 0.5
