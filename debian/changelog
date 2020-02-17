@@ -1,4 +1,58 @@
-oduino (0.1) stable; urgency=medium
+oduino (1.1.2) unstable; urgency=medium
+
+  * Update debian/changelog
+  * Add odroid-config check before installing
+
+ -- Hyeonki Hong <hhk7734@gmail.com>  Mon, 17 Feb 2020 14:54:50 +0900
+
+oduino (1.1.1) unstable; urgency=medium
+
+  * Refactor install.sh
+
+ -- Hyeonki Hong <hhk7734@gmail.com>  Sat, 15 Feb 2020 16:38:00 +0900
+
+oduino (1.1.0) unstable; urgency=medium
+
+  * Add udev rule ans install.sh
+  * Update submodule tty0uart
+  * Add LED_BUILTIN 13
+
+ -- Hyeonki Hong <hhk7734@gmail.com>  Fri, 27 Dec 2019 19:12:00 +0900
+
+oduino (1.0.1) unstable; urgency=medium
+
+  * Change tool from terminal to bridge
+  * Add error condition handling in begin
+  * Update submodule tty0uart
+
+ -- Hyeonki Hong <hhk7734@gmail.com>  Tue, 24 Dec 2019 18:54:00 +0900
+
+oduino (1.0.0) unstable; urgency=medium
+
+  * Add virtual serial to UART
+
+ -- Hyeonki Hong <hhk7734@gmail.com>  Wed, 18 Dec 2019 17:04:00 +0900
+
+oduino (0.2.0) unstable; urgency=medium
+
+  * Revise pin-map from WiringPi to Physical location
+  * Add hooks.c for yield
+
+ -- Hyeonki Hong <hhk7734@gmail.com>  Tue, 29 Oct 2019 00:00:00 +0900
+
+oduino (0.1.2) unstable; urgency=medium
+
+  * Update UART class
+
+ -- Hyeonki Hong <hhk7734@gmail.com>  Mon, 9 Sep 2019 00:00:00 +0900
+
+oduino (0.1.1) unstable; urgency=medium
+
+  * Add old API compatibility
+
+ -- Hyeonki Hong <hhk7734@gmail.com>  Mon, 19 Aug 2019 00:00:00 +0900
+
+oduino (0.1.0) unstable; urgency=medium
 
   * Initial release.
 
