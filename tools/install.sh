@@ -70,17 +70,22 @@ printf "%s\nAdding udev rules and registering %s to spi, i2c group.\n%s" \
 sleep 0.5
 
 if ! grep -q spi: /etc/group; then
-    addgroup spi
+    groupadd -f spi
 fi
 
 if ! grep -q i2c: /etc/group; then
-    addgroup i2c
+    groupadd -f i2c
+fi
+
+if ! grep -q gpio: /etc/group; then
+    groupadd -f gpio
 fi
 
 install -m 0644 "$SCRIPT_PATH/52-oduino.rules" /etc/udev/rules.d
 
 usermod -aG spi "$SUDO_USER"
 usermod -aG i2c "$SUDO_USER"
+usermod -aG gpio "$SUDO_USER"
 
 printf "%s\nPlease reboot before use!!!\n%s" "${ORANGE}${BOLD}" "${DEFAULT}"
 
