@@ -41,23 +41,50 @@ fi
 
 SCRIPT_PATH=$(dirname "$(realpath "$0")")
 
+isInstalled() {
+    [ -n "$(command -v "$1" 2>/dev/null)" ]
+}
+
+existIn() {
+    [ -n "$(find "$1" -name "$2" 2>/dev/null)" ]
+}
+
 printf "%s\nAdding hardkernel/ppa and installing required packages.\n%s" \
     "${ORANGE}${BOLD}" "${DEFAULT}"
-sleep 0.5
 
-add-apt-repository -y ppa:hardkernel/ppa &&
-    apt update
-
-apt install -y build-essential \
-    git \
-    odroid-wiringpi \
-    libwiringpi-dev \
-    python3 \
-    python3-tk
-
-if ! [ -n "$(command -v odroid-config 2>/dev/null)" ]; then
-    apt install -y odroid-config
+if ! existIn "/etc/apt/sources.list.d" "*hardkernel-ubuntu-ppa*"; then
+    add-apt-repository -y ppa:hardkernel/ppa
 fi
+
+apt update
+
+DEPENDENCIES=""
+
+if ! isInstalled odroid-config; then
+    DEPENDENCIES="${DEPENDENCIES} odroid-config"
+fi
+
+if ! isInstalled git; then
+    DEPENDENCIES="${DEPENDENCIES} git"
+fi
+
+if ! isInstalled gpio; then
+    DEPENDENCIES="${DEPENDENCIES} libwiringpi-dev"
+fi
+
+if ! (isInstalled gcc && isInstalled make); then
+    DEPENDENCIES="${DEPENDENCIES} build-essential"
+fi
+
+if ! isInstalled python3; then
+    DEPENDENCIES="${DEPENDENCIES} python3"
+fi
+
+if ! (dpkg --list | grep -q python3-tk); then
+    DEPENDENCIES="${DEPENDENCIES} python3-tk"
+fi
+
+eval "apt install -y $DEPENDENCIES"
 
 printf "%s\nInstalling tty0uart.\n%s" "${ORANGE}${BOLD}" "${DEFAULT}"
 sleep 0.5
