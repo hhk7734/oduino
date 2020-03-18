@@ -15,7 +15,7 @@
   You should have received a copy of the GNU Lesser General Public
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-  
+
   Modified 23 November 2006 by David A. Mellis
   Modified 28 September 2010 by Mark Sproul
   Modified 14 August 2012 by Alarus
@@ -25,17 +25,17 @@
 
 #include "UART.h"
 
-#include <wiringSerial.h>
-#include <unistd.h>
-#include <pthread.h>
-#include <stdio.h>    // sprintf(), fprintf()
 #include <errno.h>
+#include <pthread.h>
+#include <stdio.h>     // sprintf(), fprintf()
 #include <stdlib.h>    // exit()
+#include <unistd.h>
+#include <wiringSerial.h>
 
-UartClass Console( NULL );
+UartClass Console(NULL);
 
 // tty0uart - oduino
-UartClass Serial( "/dev/ttyhk0" );
+UartClass Serial("/dev/ttyhk0");
 
 const int BUFFER_SIZE = 256;
 char      buffer[BUFFER_SIZE];
@@ -43,117 +43,88 @@ uint16_t  buffer_head = 0;
 uint16_t  buffer_tail = 0;
 pthread_t stdin_thread;
 
-UartClass::UartClass( const char *_device )
-    : fd( -1 )
-{
-    if( _device != NULL )
-    {
-        device = ( char * )malloc( sizeof( char ) * ( strlen( _device ) + 1 ) );
-        strcpy( device, _device );
+UartClass::UartClass(const char *_device)
+    : fd(-1) {
+    if(_device != NULL) {
+        device = (char *)malloc(sizeof(char) * (strlen(_device) + 1));
+        strcpy(device, _device);
     }
 }
 
-void *stdin_thread_loop( void *arg )
-{
-    for( ;; )
-    {
-        char temp = serialGetchar( STDIN_FILENO );
+void *stdin_thread_loop(void *arg) {
+    for(;;) {
+        char temp = serialGetchar(STDIN_FILENO);
 
-        if( temp == '\n' )
-        {
+        if(temp == '\n') {
             buffer[buffer_head] = '\r';
-            buffer_head         = ( buffer_head + 1 ) % BUFFER_SIZE;
-            if( buffer_head == buffer_tail )
-            {
-                buffer_tail = ( buffer_tail + 1 ) % BUFFER_SIZE;
+            buffer_head         = (buffer_head + 1) % BUFFER_SIZE;
+            if(buffer_head == buffer_tail) {
+                buffer_tail = (buffer_tail + 1) % BUFFER_SIZE;
             }
         }
 
         buffer[buffer_head] = temp;
-        buffer_head         = ( buffer_head + 1 ) % BUFFER_SIZE;
+        buffer_head         = (buffer_head + 1) % BUFFER_SIZE;
 
-        if( buffer_head == buffer_tail )
-        {
-            buffer_tail = ( buffer_tail + 1 ) % BUFFER_SIZE;
+        if(buffer_head == buffer_tail) {
+            buffer_tail = (buffer_tail + 1) % BUFFER_SIZE;
         }
     }
 }
 
-void UartClass::begin( unsigned long baudrate, uint16_t config )
-{
-    if( device == NULL )
-    {
-        if( fd < 0 )
-        {
+void UartClass::begin(unsigned long baudrate, uint16_t config) {
+    if(device == NULL) {
+        if(fd < 0) {
             fd = STDOUT_FILENO;
-            pthread_create( &stdin_thread, NULL, stdin_thread_loop, NULL );
+            pthread_create(&stdin_thread, NULL, stdin_thread_loop, NULL);
         }
-    }
-    else
-    {
-        if( fd > 0 )
-        {
-            end();
-        }
+    } else {
+        if(fd > 0) { end(); }
 
-        fd = serialOpen( device, baudrate );
-        if( fd < 0 )
-        {
-            fprintf( stderr, "Unable to open %s : %s\n", device, strerror( errno ) );
-            exit( EXIT_FAILURE );
+        fd = serialOpen(device, baudrate);
+        if(fd < 0) {
+            fprintf(
+                stderr, "Unable to open %s : %s\n", device, strerror(errno));
+            exit(EXIT_FAILURE);
         }
     }
 }
 
-void UartClass::end()
-{
-    if( device != NULL )
-    {
-        serialClose( fd );
-        free( device );
+void UartClass::end() {
+    if(device != NULL) {
+        serialClose(fd);
+        free(device);
     }
 }
 
-int UartClass::available( void )
-{
-    if( device != NULL )
-    {
-        return serialDataAvail( fd );
-    }
-    else
-    {
-        return ( BUFFER_SIZE + buffer_head - buffer_tail ) % BUFFER_SIZE;
+int UartClass::available(void) {
+    if(device != NULL) {
+        return serialDataAvail(fd);
+    } else {
+        return (BUFFER_SIZE + buffer_head - buffer_tail) % BUFFER_SIZE;
     }
 }
 
-int UartClass::peek( void ) {}
+int UartClass::peek(void) {}
 
-int UartClass::read( void )
-{
-    if( device != NULL )
-    {
-        return serialGetchar( fd );
-    }
-    else
-    {
-        if( available() != 0 )
-        {
+int UartClass::read(void) {
+    if(device != NULL) {
+        return serialGetchar(fd);
+    } else {
+        if(available() != 0) {
             char temp   = buffer[buffer_tail];
-            buffer_tail = ( buffer_tail + 1 ) % BUFFER_SIZE;
+            buffer_tail = (buffer_tail + 1) % BUFFER_SIZE;
             return temp;
-        }
-        else
-        {
+        } else {
             return -1;
         }
     }
 }
-int UartClass::availableForWrite( void ) {}
+int UartClass::availableForWrite(void) {}
 
-void UartClass::flush( void ) {}
+void UartClass::flush(void) {}
 
-size_t UartClass::write( uint8_t c )
-{
-    serialPutchar( fd, c );
+size_t UartClass::write(uint8_t c) {
+    serialPutchar(fd, c);
     return 1;
 }

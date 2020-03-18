@@ -28,7 +28,7 @@ extern "C" {
 
 const int LED_BUILTIN = 13;
 
-#define digitalPinToInterrupt( P ) ( P )
+#define digitalPinToInterrupt(P) (P)
 
 #ifdef __cplusplus
 }    // extern "C"

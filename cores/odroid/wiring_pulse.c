@@ -23,9 +23,8 @@
  * to 3 minutes in length, but must be called at least a few dozen microseconds
  * before the start of the pulse.
  */
-unsigned long pulseIn( uint8_t pin, uint8_t state, unsigned long timeout )
-{
-    return pulseInLong( pin, state, timeout );
+unsigned long pulseIn(uint8_t pin, uint8_t state, unsigned long timeout) {
+    return pulseInLong(pin, state, timeout);
 }
 
 
@@ -37,37 +36,24 @@ unsigned long pulseIn( uint8_t pin, uint8_t state, unsigned long timeout )
  * ATTENTION:
  * this function relies on micros() so cannot be used in noInterrupt() context
  */
-unsigned long pulseInLong( uint8_t pin, uint8_t state, unsigned long timeout )
-{
+unsigned long pulseInLong(uint8_t pin, uint8_t state, unsigned long timeout) {
     // cache the port and bit of the pin in order to speed up the
     // pulse width measuring loop and achieve finer resolution.  calling
     // digitalRead() instead yields much coarser resolution.
     unsigned long startMicros = micros();
 
-    while( digitalRead( pin ) == state )
-    {
-        if( micros() - startMicros > timeout )
-        {
-            return 0;
-        }
+    while(digitalRead(pin) == state) {
+        if(micros() - startMicros > timeout) { return 0; }
     }
 
-    while( digitalRead( pin ) != state )
-    {
-        if( micros() - startMicros > timeout )
-        {
-            return 0;
-        }
+    while(digitalRead(pin) != state) {
+        if(micros() - startMicros > timeout) { return 0; }
     }
 
     uint32_t start = micros();
 
-    while( digitalRead( pin ) == state )
-    {
-        if( micros() - startMicros > timeout )
-        {
-            return 0;
-        }
+    while(digitalRead(pin) == state) {
+        if(micros() - startMicros > timeout) { return 0; }
     }
 
     return micros() - start;
