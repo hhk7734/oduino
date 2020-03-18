@@ -28,24 +28,23 @@
 
 #include "api/HardwareSerial.h"
 
-class UartClass : public HardwareSerial
-{
+class UartClass: public HardwareSerial {
 public:
-    UartClass( const char *_device );
+    UartClass(const char *_device);
 
-    void           begin( unsigned long baudrate, uint16_t config );
-    void           begin( unsigned long baudrate = 115200 ) { begin( baudrate, SERIAL_8N1 ); }
-    void           end( void );
-    virtual int    available( void );
-    virtual int    peek( void );
-    virtual int    read( void );
-    virtual int    availableForWrite( void );
-    virtual void   flush( void );
-    virtual size_t write( uint8_t );
-    inline size_t  write( unsigned long n ) { return write( ( uint8_t )n ); }
-    inline size_t  write( long n ) { return write( ( uint8_t )n ); }
-    inline size_t  write( unsigned int n ) { return write( ( uint8_t )n ); }
-    inline size_t  write( int n ) { return write( ( uint8_t )n ); }
+    void begin(unsigned long baudrate, uint16_t config);
+    void begin(unsigned long baudrate = 115200) { begin(baudrate, SERIAL_8N1); }
+    void end(void);
+    virtual int    available(void);
+    virtual int    peek(void);
+    virtual int    read(void);
+    virtual int    availableForWrite(void);
+    virtual void   flush(void);
+    virtual size_t write(uint8_t);
+    inline size_t  write(unsigned long n) { return write((uint8_t)n); }
+    inline size_t  write(long n) { return write((uint8_t)n); }
+    inline size_t  write(unsigned int n) { return write((uint8_t)n); }
+    inline size_t  write(int n) { return write((uint8_t)n); }
     using Print::write;    // pull in write(str) and write(buf, size) from Print
     virtual operator bool() { return true; }
 
