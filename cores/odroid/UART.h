@@ -59,15 +59,4 @@ extern UartClass Console;
 extern UartClass Serial;
 #define HAVE_HWSERIAL0
 
-#if defined( ARDUINO_ODROID_C2 ) || defined( ARDUINO_ODROID_XU3 ) || defined( ARDUINO_ODROID_XU4 ) \
-    || defined( ARDUINO_ODROID_N2 )
-extern UartClass Serial1;
-#define HAVE_HWSERIAL1
-#endif
-
-#if defined( ARDUINO_ODROID_N2 )
-extern UartClass Serial2;
-#define HAVE_HWSERIAL2
-#endif
-
 #endif    // _UART_CLASS_H_

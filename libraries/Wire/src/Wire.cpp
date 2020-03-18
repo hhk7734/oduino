@@ -30,29 +30,9 @@
 #include <unistd.h>
 #include <stdlib.h>    // exit()
 
-#if defined( ARDUINO_ODROID_C1 ) || defined( ARDUINO_ODROID_C2 ) || defined( ARDUINO_ODROID_XU3 ) \
-    || defined( ARDUINO_ODROID_XU4 )
 TwoWire Wire1( 1 );
-#endif
-
-#if defined( ARDUINO_ODROID_C1 ) || defined( ARDUINO_ODROID_C2 ) || defined( ARDUINO_ODROID_N2 )
-TwoWire Wire2( 2 );
-#endif
-
-#if defined( ARDUINO_ODROID_N2 )
-TwoWire Wire3( 3 );
-#endif
-
-#if defined( ARDUINO_ODROID_XU3 ) || defined( ARDUINO_ODROID_XU4 )
-TwoWire Wire5( 5 );
-#endif
-
-#if defined( ARDUINO_ODROID_C1 ) || defined( ARDUINO_ODROID_C2 ) || defined( ARDUINO_ODROID_XU3 ) \
-    || defined( ARDUINO_ODROID_XU4 )
 TwoWire &Wire = Wire1;
-#elif defined( ARDUINO_ODROID_N2 )
-TwoWire &Wire = Wire2;
-#endif
+TwoWire Wire2( 2 );
 
 TwoWire::TwoWire( uint8_t _i2c_num )
     : i2c_num( _i2c_num )

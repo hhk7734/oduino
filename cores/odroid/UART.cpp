@@ -37,16 +37,6 @@ UartClass Console( NULL );
 // tty0uart - oduino
 UartClass Serial( "/dev/ttyhk0" );
 
-#if defined( ARDUINO_ODROID_C2 ) || defined( ARDUINO_ODROID_N2 )
-UartClass Serial1( "/dev/ttyS1" );
-#elif defined( ARDUINO_ODROID_XU3 ) || defined( ARDUINO_ODROID_XU4 )
-UartClass Serial1( "/dev/ttySAC0" );
-#endif
-
-#if defined( ARDUINO_ODROID_N2 )
-UartClass Serial2( "/dev/ttyS2" );
-#endif
-
 const int BUFFER_SIZE = 256;
 char      buffer[BUFFER_SIZE];
 uint16_t  buffer_head = 0;
