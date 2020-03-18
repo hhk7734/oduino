@@ -31,6 +31,6 @@ If you already opened the Arduino IDE, Close and reopen the Arduino IDE.
 
 ## Setup
 
-* Tools -> Board: -> ODROID Series
+* Tools -> Board: -> ODROID
 * Tools -> Port: -> /dev/ttyHK0
 * Tools -> Programmer: -> Bridge
