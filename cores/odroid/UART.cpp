@@ -178,14 +178,14 @@ void UartClass::setMode(uint16_t mode) {
     options.c_cflag |= (CLOCAL | CREAD);
 
     options.c_cflag &= ~CSIZE;
-    switch(mode | SERIAL_DATA_MASK) {
+    switch(mode & SERIAL_DATA_MASK) {
     case SERIAL_DATA_5: options.c_cflag |= CS5;
     case SERIAL_DATA_6: options.c_cflag |= CS6;
     case SERIAL_DATA_7: options.c_cflag |= CS7;
     case SERIAL_DATA_8: options.c_cflag |= CS8;
     }
 
-    switch(mode | SERIAL_PARITY_MASK) {
+    switch(mode & SERIAL_PARITY_MASK) {
     case SERIAL_PARITY_NONE:
         // None
         options.c_cflag &= ~PARENB;
@@ -211,7 +211,7 @@ void UartClass::setMode(uint16_t mode) {
         break;
     }
 
-    switch(mode | SERIAL_STOP_BIT_MASK) {
+    switch(mode & SERIAL_STOP_BIT_MASK) {
     case SERIAL_STOP_BIT_1: options.c_cflag &= ~CSTOPB; break;
     case SERIAL_STOP_BIT_2: options.c_cflag |= CSTOPB; break;
     }
