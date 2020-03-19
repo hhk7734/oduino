@@ -1,52 +1,78 @@
+/*
+ * SPI Master library for ODROID.
+ *
+ * Copyright (c) 2015 Arduino LLC
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ * Modified 2019-2020 by Hyeonki Hong (ODROID support)
+ */
+
 #ifndef _SPI_H_
 #define _SPI_H_
 #pragma once
 
 #include <Arduino.h>
 
-#define SPI_MODE0 0
-#define SPI_MODE1 1
-#define SPI_MODE2 2
-#define SPI_MODE3 3
+#ifdef max
+#undef max
+#endif
+#ifdef min
+#undef min
+#endif
 
-#define SPI_CLOCK_DIV2   0xFF
-#define SPI_CLOCK_DIV4   0xFF
-#define SPI_CLOCK_DIV8   0xFF
-#define SPI_CLOCK_DIV16  0xFF
-#define SPI_CLOCK_DIV32  0xFF
-#define SPI_CLOCK_DIV64  0xFF
-#define SPI_CLOCK_DIV128 0xFF
+#include <string>
+
+enum SpiMode { SPI_MODE0, SPI_MODE1, SPI_MODE2, SPI_MODE3 };
 
 class SPISettings {
 public:
     SPISettings();
-    SPISettings(uint32_t clock, uint8_t bitOrder, uint8_t dataMode) {}
+    SPISettings(uint32_t clock, BitOrder bitOrder, SpiMode spiMode) {}
     friend class SPIClass;
 };
 
 class SPIClass {
 public:
-    SPIClass(uint8_t _channel);
-    void begin(const char *device, uint32_t speed, uint8_t mode);
-    void begin(uint32_t speed, uint8_t mode);
-    void begin(void) { begin(1000000, 0); }
+    SPIClass(const std::string &device);
+    SPIClass(uint16_t bus, uint16_t chipSelect);
+    SPIClass(uint16_t chipSelect);
+    ~SPIClass();
+
+    void begin(uint32_t clock, BitOrder bitOrder, SpiMode spiMode);
+    void begin(void) { begin(1'000'000, MSBFIRST, SPI_MODE0); }
     void end(void);
 
-    void setBitOrder(uint8_t bitOrder);
-    void setDataMode(uint8_t dataMode);
-    void setClockDivider(uint8_t clockDiv);
-    void setFrequency(uint32_t freq);
+    [[deprecated(
+        "Use setClock() in ODROID. With setClockDivider(), 1MHz is set.")]] void
+         setClockDivider(uint8_t clockDiv);
+    void setClock(uint32_t clock);
+    void setBitOrder(BitOrder bitOrder);
+    void setDataMode(SpiMode spiMode);
 
     void beginTransaction(SPISettings settings);
     void endTransaction(void);
 
     uint8_t  transfer(uint8_t data);
-    uint8_t  transfer(uint8_t *buf, size_t count);
+    size_t   transfer(uint8_t *buf, size_t count);
     uint16_t transfer16(uint16_t data);
 
-private:
-    int     fd;
-    uint8_t channel;
+protected:
+    std::string mDevice;
+    int         mFd;
+    uint8_t     mOptions;
 };
 
 extern SPIClass  SPI0;
