@@ -19,7 +19,7 @@
   Modified 28 September 2010 by Mark Sproul
   Modified 14 August 2012 by Alarus
   Modified 3 December 2013 by Matthijs Kooijman
-  Modified 19 June 2019 by Hyeonki hong (odroid support)
+  Modified 2019-2020 by Hyeonki hong (odroid support)
 */
 
 #ifndef _UART_CLASS_H_
@@ -28,32 +28,45 @@
 
 #include "api/HardwareSerial.h"
 
+#ifdef max
+#undef max
+#endif
+#ifdef min
+#undef min
+#endif
+
+#include <string>
+
 class UartClass: public HardwareSerial {
 public:
-    UartClass(const char *_device);
+    UartClass(const std::string &device);
+    ~UartClass();
 
-    void begin(unsigned long baudrate, uint16_t config);
+    void begin(unsigned long baudrate, uint16_t mode);
     void begin(unsigned long baudrate = 115200) { begin(baudrate, SERIAL_8N1); }
     void end(void);
-    virtual int    available(void);
-    virtual int    peek(void);
-    virtual int    read(void);
+    virtual int    available(void) override;
+    virtual int    peek(void) override;
+    virtual int    read(void) override;
     virtual int    availableForWrite(void);
-    virtual void   flush(void);
-    virtual size_t write(uint8_t);
+    virtual void   flush(void) override;
+    virtual size_t write(uint8_t) override;
     inline size_t  write(unsigned long n) { return write((uint8_t)n); }
     inline size_t  write(long n) { return write((uint8_t)n); }
     inline size_t  write(unsigned int n) { return write((uint8_t)n); }
     inline size_t  write(int n) { return write((uint8_t)n); }
     using Print::write;    // pull in write(str) and write(buf, size) from Print
-    virtual operator bool() { return true; }
+    virtual size_t write(const uint8_t *buffer, size_t size) override;
+    virtual        operator bool() override { return true; }
 
 protected:
-    char *device = NULL;
-    int   fd;
-};
+    std::string mDevice;
+    int         mFd;
 
-extern UartClass Console;
+private:
+    void setBaudrate(uint32_t baudrate);
+    void setMode(uint16_t mode);
+};
 
 extern UartClass Serial;
 #define HAVE_HWSERIAL0
