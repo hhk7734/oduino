@@ -25,14 +25,6 @@
 #pragma once
 
 #include <Arduino.h>
-
-#ifdef max
-#undef max
-#endif
-#ifdef min
-#undef min
-#endif
-
 #include <string>
 
 enum SpiMode { SPI_MODE0, SPI_MODE1, SPI_MODE2, SPI_MODE3 };
