@@ -14,7 +14,7 @@ compiler.c.cmd=gcc
 compiler.c.flags=-c -g -lwiringPi -lm -lpthread -lrt -lcrypt {compiler.extra_includes}
 
 compiler.cpp.cmd=g++
-compiler.cpp.flags={compiler.c.flags}
+compiler.cpp.flags={compiler.c.flags} -std=c++17
 
 compiler.ar.cmd=ar
 compiler.ar.flags=rcs
