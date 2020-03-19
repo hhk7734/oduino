@@ -28,13 +28,6 @@
 
 #include "api/HardwareSerial.h"
 
-#ifdef max
-#undef max
-#endif
-#ifdef min
-#undef min
-#endif
-
 #include <string>
 
 class UartClass: public HardwareSerial {

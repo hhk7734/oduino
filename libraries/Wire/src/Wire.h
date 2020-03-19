@@ -25,14 +25,6 @@
 #pragma once
 
 #include <Arduino.h>
-
-#ifdef max
-#undef max
-#endif
-#ifdef min
-#undef min
-#endif
-
 #include <string>
 
 constexpr int MAX_I2C_BUFFER_SIZE = 1 << 7;

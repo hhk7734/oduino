@@ -38,20 +38,6 @@ typedef enum {
 #define SERIAL      0x0
 #define DISPLAY     0x1
 
-#ifndef min
-#define min(a,b) \
-   ({ __typeof__ (a) _a = (a); \
-       __typeof__ (b) _b = (b); \
-     _a < _b ? _a : _b; })
-#endif
-
-#ifndef max
-#define max(a,b) \
-   ({ __typeof__ (a) _a = (a); \
-       __typeof__ (b) _b = (b); \
-     _a > _b ? _a : _b; })
-#endif
-
 #ifndef constrain
 #define constrain(amt,low,high) ((amt)<(low)?(low):((amt)>(high)?(high):(amt)))
 #endif
@@ -132,6 +118,20 @@ void loop(void);
 #endif
 
 #ifdef __cplusplus
+
+#ifndef min
+template<typename T>
+constexpr T min(T a, T b) {
+    return a < b ? a : b;
+}
+#endif
+
+#ifndef max
+template<typename T>
+constexpr T max(T a, T b) {
+    return a > b ? a : b;
+}
+#endif
 
 /* C++ prototypes */
 uint16_t makeWord(uint16_t w);
