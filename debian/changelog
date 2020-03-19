@@ -1,3 +1,14 @@
+oduino (1.2.0) unstable; urgency=medium
+
+  * Update .clang-format
+  * Refactor Serial class to remove wiringPi
+  * Refactor SPIClass to remove wiringPi
+  * Refactor TwoWire class
+  * Add -std=c++17 flag
+  * Fix compilation errors caused by macros
+
+ -- Hyeonki Hong <hhk7734@gmail.com>  Thu, 19 Mar 2020 14:40:50 +0900
+
 oduino (1.1.4) unstable; urgency=medium
 
   * Add package presence check before installation
