@@ -1,85 +1,93 @@
 /*
-  Wire.cpp - I2C library for odroid
-
-  Copyright (c) 2019 Hyeonki Hong. All rights reserved.
-  This file is part of the odroid core for Arduino environment.
-
-  This library is free software; you can redistribute it and/or
-  modify it under the terms of the GNU Lesser General Public
-  License as published by the Free Software Foundation; either
-  version 2.1 of the License, or (at your option) any later version.
-
-  This library is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public
-  License along with this library; if not, write to the Free Software
-  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-*/
+ * TWI/I2C library for ODROID.
+ *
+ * Copyright (c) 2015 Arduino LLC. All rights reserved.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ * Modified 2019-2020 by Hyeonki Hong (ODROID support)
+ */
 
 #include "Wire.h"
 
-#include <errno.h>
-#include <fcntl.h>
+#include <algorithm>    // std::copy()
+#include <cerrno>       // errno
+#include <cstring>      // std::std::strerror()
+#include <fcntl.h>      // open()
+#include <iostream>     // std::cerr, std::endl
 #include <linux/i2c-dev.h>
 #include <linux/i2c.h>
-#include <stdio.h>
-#include <stdlib.h>    // exit()
-#include <sys/ioctl.h>
-#include <unistd.h>
+#include <stdexcept>      // std::runtime_error()
+#include <sys/ioctl.h>    // ioctl()
+#include <unistd.h>       // close()
 
-TwoWire  Wire1(1);
+TwoWire  Wire1("/dev/i2c-1");
 TwoWire &Wire = Wire1;
-TwoWire  Wire2(2);
+TwoWire  Wire2("/dev/i2c-2");
 
-TwoWire::TwoWire(uint8_t _i2c_num)
-    : i2c_num(_i2c_num)
-    , fd(-1) {}
+TwoWire::TwoWire(const std::string &device)
+    : mDevice(device)
+    , mFd(-1) {}
 
-void TwoWire::begin(uint8_t slave_address) {
-    char device[15];
+TwoWire::TwoWire(uint8_t deviceNum)
+    : mFd(-1) {
+    mDevice.reserve(15);
+    mDevice += "/dev/i2c-";
+    mDevice += std::to_string(deviceNum);
+}
 
-    device_address = slave_address;
+TwoWire::~TwoWire() { end(); }
 
-    sprintf(device, "/dev/i2c-%d", i2c_num);
+void TwoWire::begin(uint8_t slaveAddress) {
+    if(mFd > 0) { end(); }
 
-    if(fd > 0) { end(); }
-
-    fd = open(device, O_RDWR);
-    if(fd < 0) {
-        fprintf(stderr, "Unable to open %s : %s\n", device, strerror(errno));
-        exit(EXIT_FAILURE);
+    mFd = open(mDevice.c_str(), O_RDWR);
+    if(mFd < 0) {
+        std::cerr << "Failed to open " << mDevice << std::endl;
+        throw std::runtime_error(std::strerror(errno));
     }
+
+    mSlaveAddress = slaveAddress;
 }
 
 void TwoWire::end(void) {
-    close(fd);
-    fd = -1;
+    close(mFd);
+    mFd = -1;
 }
 
 void TwoWire::setClock(uint32_t clock) {}
 
-void TwoWire::beginTransmission(uint8_t slave_address) {
-    device_address = slave_address;
-    tx_buff_index  = 0;
+void TwoWire::beginTransmission(uint8_t slaveAddress) {
+    mSlaveAddress  = slaveAddress;
+    mTxBufferIndex = 0;
 }
 
-uint8_t TwoWire::endTransmission(bool stop) {
-    if(stop) {
-        if(tx_buff_index > 0) {
+uint8_t TwoWire::endTransmission(bool stopBit) {
+    if(stopBit) {
+        if(mTxBufferIndex > 0) {
             struct i2c_rdwr_ioctl_data i2c;
             struct i2c_msg             msgs;
-            msgs.addr  = device_address;
+            msgs.addr  = mSlaveAddress;
             msgs.flags = 0;
-            msgs.len   = tx_buff_index;
-            msgs.buf   = tx_buff;
+            msgs.len   = mTxBufferIndex;
+            msgs.buf   = mTxBuffer;
 
             i2c.msgs  = &msgs;
             i2c.nmsgs = 1;
 
-            return ioctl(fd, I2C_RDWR, &i2c);
+            return ioctl(mFd, I2C_RDWR, &i2c);
         } else {
             return 0;
         }
@@ -88,80 +96,79 @@ uint8_t TwoWire::endTransmission(bool stop) {
     return 0;
 }
 
-uint8_t TwoWire::requestFrom(uint8_t slave_address, size_t len, bool stop) {
-    device_address = slave_address;
-    rx_buff_index  = 0;
-    rx_buff_len    = len;
+uint8_t TwoWire::requestFrom(uint8_t slaveAddress, size_t size, bool stop) {
+    mSlaveAddress  = slaveAddress;
+    mRxBufferIndex = 0;
+    mRxBufferSize  = size;
 
     struct i2c_rdwr_ioctl_data i2c;
     struct i2c_msg             msgs[2];
 
-    if(tx_buff_index > 0) {
-        msgs[0].addr  = device_address;
+    if(mTxBufferIndex > 0) {
+        msgs[0].addr  = mSlaveAddress;
         msgs[0].flags = 0;    /// write
-        msgs[0].len   = tx_buff_index;
-        msgs[0].buf   = tx_buff;
+        msgs[0].len   = mTxBufferIndex;
+        msgs[0].buf   = mTxBuffer;
 
-        msgs[1].addr  = device_address;
+        msgs[1].addr  = mSlaveAddress;
         msgs[1].flags = I2C_M_RD;    /// read
-        msgs[1].len   = rx_buff_len;
-        msgs[1].buf   = rx_buff;
+        msgs[1].len   = mRxBufferSize;
+        msgs[1].buf   = mRxBuffer;
 
         i2c.msgs  = msgs;
         i2c.nmsgs = 2;
     } else {
-        msgs[0].addr  = device_address;
+        msgs[0].addr  = mSlaveAddress;
         msgs[0].flags = I2C_M_RD;    /// read
-        msgs[0].len   = rx_buff_len;
-        msgs[0].buf   = rx_buff;
+        msgs[0].len   = mRxBufferSize;
+        msgs[0].buf   = mRxBuffer;
 
         i2c.msgs  = msgs;
         i2c.nmsgs = 1;
     }
 
-    return ioctl(fd, I2C_RDWR, &i2c);
+    return ioctl(mFd, I2C_RDWR, &i2c);
 }
 
-uint8_t TwoWire::requestFrom(uint8_t slave_address, size_t len) {
-    return requestFrom(slave_address, len, true);
-}
+void TwoWire::onReceive(void (*)(int)) {}
 
-uint8_t TwoWire::requestFrom(int slave_address, int len) {
-    return requestFrom((uint8_t)slave_address, (size_t)len, true);
-}
-
-uint8_t TwoWire::requestFrom(int slave_address, int len, int stop) {
-    return requestFrom((uint8_t)slave_address, (size_t)len, (bool)true);
-}
+void TwoWire::onRequest(void (*)(void)) {}
 
 size_t TwoWire::write(uint8_t data) {
-    if(tx_buff_index < I2C_BUFFER_SIZE) {
-        tx_buff[tx_buff_index++] = data;
-    } else {
-    }
-}
-
-size_t TwoWire::write(const uint8_t *data, size_t len) {
-    if(tx_buff_index + len - 1 < I2C_BUFFER_SIZE) {
-        memcpy(&tx_buff[tx_buff_index], data, len);
-        tx_buff_index += len;
-    }
-}
-
-int TwoWire::available(void) { return rx_buff_len - rx_buff_index; }
-
-int TwoWire::read(void) {
-    if(rx_buff_index < rx_buff_len) {
-        return rx_buff[rx_buff_index++];
+    if(mTxBufferIndex < MAX_I2C_BUFFER_SIZE) {
+        mTxBuffer[mTxBufferIndex++] = data;
+        return 1;
     } else {
         return 0;
     }
 }
 
-int TwoWire::peek(void) {}
+size_t TwoWire::write(const uint8_t *data, size_t size) {
+    if(mTxBufferIndex + size <= MAX_I2C_BUFFER_SIZE) {
+        std::copy(data, data + size, &mTxBuffer[mTxBufferIndex]);
+        mTxBufferIndex += size;
+        return size;
+    } else {
+        return 0;
+    }
+}
+
+int TwoWire::available(void) { return mRxBufferSize - mRxBufferIndex; }
+
+int TwoWire::read(void) {
+    if(mRxBufferIndex < mRxBufferSize) {
+        return mRxBuffer[mRxBufferIndex++];
+    } else {
+        return -1;
+    }
+}
+
+int TwoWire::peek(void) {
+    if(mRxBufferIndex < mRxBufferSize) {
+        return mRxBuffer[mRxBufferIndex];
+    } else {
+        return -1;
+    }
+}
 
 void TwoWire::flush(void) {}
-
-void TwoWire::onReceive(void (*)(int)) {}
-
-void TwoWire::onRequest(void (*)(void)) {}
