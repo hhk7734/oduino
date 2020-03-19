@@ -1,3 +1,9 @@
+oduino (1.2.1) unstable; urgency=medium
+
+  * Fix UART mode setting problem
+
+ -- Hyeonki Hong <hhk7734@gmail.com>  Thu, 19 Mar 2020 18:34:43 +0900
+
 oduino (1.2.0) unstable; urgency=medium
 
   * Update .clang-format
