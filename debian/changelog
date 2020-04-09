@@ -1,3 +1,9 @@
+oduino (1.2.2) unstable; urgency=medium
+
+  * Update udev.rules
+
+ -- Hyeonki Hong <hhk7734@gmail.com>  Thu, 09 Apr 2020 18:48:03 +0900
+
 oduino (1.2.1) unstable; urgency=medium
 
   * Fix UART mode setting problem
