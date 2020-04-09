@@ -108,11 +108,16 @@ if ! grep -q gpio: /etc/group; then
     groupadd -f gpio
 fi
 
+if ! grep -q dialout: /etc/group; then
+    groupadd -f dialout
+fi
+
 install -m 0644 "$SCRIPT_PATH/52-oduino.rules" /etc/udev/rules.d
 
 usermod -aG spi "$SUDO_USER"
 usermod -aG i2c "$SUDO_USER"
 usermod -aG gpio "$SUDO_USER"
+usermod -aG dialout "$SUDO_USER"
 
 printf "%s\nPlease reboot before use!!!\n%s" "${ORANGE}${BOLD}" "${DEFAULT}"
 

@@ -1,8 +1,9 @@
-# /dev/spidev
-KERNEL=="spidev*", GROUP="spi", MODE="0660"
+SUBSYSTEM=="i2c-dev", GROUP="i2c", MODE="0660"
+SUBSYSTEM=="spidev", GROUP="spi", MODE="0660"
+KERNEL=="ttyS*", GROUP="dialout", MODE="0660"
+KERNEL=="ttyAML*", GROUP="dialout", MODE="0660"
+KERNEL=="ttySAC*", GROUP="dialout", MODE="0660"
 
-# /dev/i2c-
-KERNEL=="i2c-*", GROUP="i2c", MODE="0660"
-
+SUBSYSTEM=="gpio", GROUP="gpio", MODE="0660"
 # /sys/class/gpio
 SUBSYSTEM=="gpio*", PROGRAM="/bin/sh -c 'find -L /sys/class/gpio/ -maxdepth 2 -exec chgrp -HR gpio {} \; -exec chmod -R 770 {} \; || true'"
