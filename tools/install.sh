@@ -89,11 +89,15 @@ eval "apt install -y $DEPENDENCIES"
 printf "%s\nInstalling tty0uart.\n%s" "${ORANGE}${BOLD}" "${DEFAULT}"
 sleep 0.5
 
-make -C "$SCRIPT_PATH/tty0uart" &&
-    make -C "$SCRIPT_PATH/tty0uart" install
+# Even if the module exists, if it is not loaded, install it.
+if ! (lsmod | grep -q tty0uart); then
+    make -C "$SCRIPT_PATH/tty0uart" &&
+        make -C "$SCRIPT_PATH/tty0uart" install
+fi
 
-printf "%s\nAdding udev rules and registering %s to spi, i2c group.\n%s" \
-    "${ORANGE}${BOLD}" "${SUDO_USER}" "${DEFAULT}"
+printf "%s\nAdding udev rules and registering %s to %s group.\n%s" \
+    "${ORANGE}${BOLD}" "${SUDO_USER}" \
+    "spi, i2c, gpio, dialout" "${DEFAULT}"
 sleep 0.5
 
 if ! grep -q spi: /etc/group; then
