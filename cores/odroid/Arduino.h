@@ -36,6 +36,8 @@ const int LED_BUILTIN = 13;
 
 #ifdef __cplusplus
 #include "UART.h"
+
+void init_time(void);
 #endif    // __cplusplus
 
 #endif    // _ARDUINO_H_
