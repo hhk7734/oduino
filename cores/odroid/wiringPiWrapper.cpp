@@ -25,7 +25,6 @@
 #include "wiringPiWrapper.h"
 
 #include <wiringPi.h>
-#include <wiringShift.h>
 
 void wiringpi_setup() { wiringPiSetupPhys(); }
 
@@ -40,14 +39,6 @@ void wiringpi_digitalWrite(int pinNumber, int status) {
 int wiringpi_digitalRead(int pinNumber) { return digitalRead(pinNumber); }
 
 int wiringpi_analogRead(int pinNumber) { return analogRead(pinNumber); }
-
-void wiringpi_shiftOut(int dataPin, int clockPin, int bitOrder, uint8_t val) {
-    shiftOut(dataPin, clockPin, bitOrder, val);
-}
-
-int wiringpi_shiftIn(int dataPin, int clockPin, int bitOrder) {
-    return shiftIn(dataPin, clockPin, bitOrder);
-}
 
 void wiringpi_attachInterrupt(int interruptNumber,
                               void (*callback)(void),

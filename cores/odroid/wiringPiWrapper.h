@@ -38,9 +38,6 @@ unsigned long wiringpi_pulseIn(int pin, uint8_t state, unsigned long timeout);
 unsigned long
     wiringpi_pulseInLong(int pin, uint8_t state, unsigned long timeout);
 
-void wiringpi_shiftOut(int dataPin, int clockPin, int bitOrder, uint8_t val);
-int  wiringpi_shiftIn(int dataPin, int clockPin, int bitOrder);
-
 void wiringpi_attachInterrupt(int interruptNumber,
                               void (*callback)(void),
                               int mode);
