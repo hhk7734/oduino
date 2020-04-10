@@ -1,12 +1,15 @@
 #pragma once
 #include <stdint.h>
-#include "odroid_wrap.h"
 
 #ifdef __cplusplus
 extern "C"{
 #endif
 
 void yield(void);
+
+#ifdef __cplusplus
+} // extern "C"
+#endif
 
 typedef enum {
   LOW     = 0,
@@ -79,7 +82,7 @@ typedef uint16_t  word;
 void init(void);
 void initVariant(void);
 
-int atexit(void (*func)()) __attribute__((weak));
+// int atexit(void (*func)()) __attribute__((weak));
 int main() __attribute__((weak));
 
 #ifdef EXTENDED_PIN_MODE
@@ -89,22 +92,22 @@ typedef uint32_t pin_size_t;
 typedef uint8_t pin_size_t;
 #endif
 
-// void pinMode(pin_size_t pinNumber, PinMode pinMode);
-// void digitalWrite(pin_size_t pinNumber, PinStatus status);
-// PinStatus digitalRead(pin_size_t pinNumber);
-// int analogRead(pin_size_t pinNumber);
-// void analogReference(uint8_t mode);
-// void analogWrite(pin_size_t pinNumber, int value);
+void pinMode(pin_size_t pinNumber, PinMode pinMode);
+void digitalWrite(pin_size_t pinNumber, PinStatus status);
+PinStatus digitalRead(pin_size_t pinNumber);
+int analogRead(pin_size_t pinNumber);
+void analogReference(uint8_t mode);
+void analogWrite(pin_size_t pinNumber, int value);
 
-// unsigned long millis(void);
-// unsigned long micros(void);
-// void delay(unsigned long);
-// void delayMicroseconds(unsigned int us);
+unsigned long millis(void);
+unsigned long micros(void);
+void delay(unsigned long);
+void delayMicroseconds(unsigned int us);
 unsigned long pulseIn(pin_size_t pin, uint8_t state, unsigned long timeout);
 unsigned long pulseInLong(pin_size_t pin, uint8_t state, unsigned long timeout);
 
-// void shiftOut(pin_size_t dataPin, pin_size_t clockPin, BitOrder bitOrder, uint8_t val);
-// pin_size_t shiftIn(pin_size_t dataPin, pin_size_t clockPin, BitOrder bitOrder);
+void shiftOut(pin_size_t dataPin, pin_size_t clockPin, BitOrder bitOrder, uint8_t val);
+pin_size_t shiftIn(pin_size_t dataPin, pin_size_t clockPin, BitOrder bitOrder);
 
 void attachInterrupt(pin_size_t interruptNumber, voidFuncPtr callback, PinStatus mode);
 void attachInterruptParam(pin_size_t interruptNumber, voidFuncPtrParam callback, PinStatus mode, void* param);
@@ -112,10 +115,6 @@ void detachInterrupt(pin_size_t interruptNumber);
 
 void setup(void);
 void loop(void);
-
-#ifdef __cplusplus
-} // extern "C"
-#endif
 
 #ifdef __cplusplus
 

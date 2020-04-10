@@ -18,9 +18,11 @@
 */
 
 #include "Arduino.h"
+#include "wiringPiWrapper.h"
 
-int main(void) {
-    wiringPiSetupPhys();
+int __attribute__((weak)) main(void) {
+    wiringpi_setup();
+    init_time();
     setup();
     for(;;) { loop(); }
 }
