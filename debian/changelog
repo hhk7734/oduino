@@ -1,3 +1,12 @@
+oduino (1.3.0) unstable; urgency=medium
+
+  * Verify that tty0uart is installed
+  * Add time.cpp to remove wiringPi
+  * Move wiringpi to wrapper to avoid conflict
+  * Add wiringShift.cpp to remove wiringPi
+
+ -- Hyeonki Hong <hhk7734@gmail.com>  Fri, 10 Apr 2020 23:56:55 +0900
+
 oduino (1.2.2) unstable; urgency=medium
 
   * Update udev.rules
