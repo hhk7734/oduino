@@ -132,4 +132,4 @@ size_t SPIClass::transfer(uint8_t *buf, size_t count) {
     return ioctl(mFd, SPI_IOC_MESSAGE(1), &spi);
 }
 
-uint16_t SPIClass::transfer16(uint16_t data) {}
+uint16_t SPIClass::transfer16(uint16_t data) { return -1; }
