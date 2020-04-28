@@ -85,7 +85,7 @@ int UartClass::available(void) {
     return result;
 }
 
-int UartClass::peek(void) {}
+int UartClass::peek(void) { return -1; }
 
 int UartClass::read(void) {
     uint8_t data;
@@ -96,7 +96,7 @@ int UartClass::read(void) {
     return data;
 }
 
-int UartClass::availableForWrite(void) {}
+int UartClass::availableForWrite(void) { return -1; }
 
 void UartClass::flush(void) {}
 
