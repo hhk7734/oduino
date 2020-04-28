@@ -1,3 +1,9 @@
+oduino (1.4.0) unstable; urgency=medium
+
+  * Wire: set default i2c bus to 0 and 1
+
+ -- Hyeonki Hong <hhk7734@gmail.com>  Tue, 28 Apr 2020 12:40:48 +0900
+
 oduino (1.3.0) unstable; urgency=medium
 
   * Verify that tty0uart is installed
