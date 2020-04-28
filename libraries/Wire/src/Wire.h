@@ -81,8 +81,8 @@ private:
     size_t  mTxBufferIndex;
 };
 
-extern TwoWire &Wire;
+extern TwoWire  Wire0;
 extern TwoWire  Wire1;
-extern TwoWire  Wire2;
+extern TwoWire &Wire;
 
 #endif    // _WIRE_H_

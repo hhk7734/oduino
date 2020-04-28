@@ -33,9 +33,9 @@
 #include <sys/ioctl.h>    // ioctl()
 #include <unistd.h>       // close()
 
+TwoWire  Wire0("/dev/i2c-0");
 TwoWire  Wire1("/dev/i2c-1");
-TwoWire &Wire = Wire1;
-TwoWire  Wire2("/dev/i2c-2");
+TwoWire &Wire = Wire0;
 
 TwoWire::TwoWire(const std::string &device)
     : mDevice(device)
